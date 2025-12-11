@@ -288,12 +288,15 @@
 </head>
 <body>
   <div class="app-shell">
-    <header>
-      <div>
-        <h1>OSHA Self-Inspection</h1>
-        <small>Tap an item to update status & add photos</small>
-      </div>
-    </header>
+  <header>
+  <div>
+    <h1>OSHA Self-Inspection</h1>
+    <small>Tap an item to update status & add photos</small>
+  </div>
+  <button id="submitBtn" style="font-size:0.75rem;padding:0.25rem 0.6rem;border-radius:999px;border:none;background:#22c55e;color:#fff;cursor:pointer;">
+    Submit
+  </button>
+</header>
 
     <div class="filters" id="filters"></div>
 
@@ -706,6 +709,54 @@
         closeDetail();
       }
     });
+/****************************
+ * 6. SUBMIT TO GOOGLE SHEET
+ ****************************/
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWiB8fjM-AcuJJCvtaS6pa9vAtqFqnqPk5h0TJtIQDZOVT0wknPAvJeR6F-zTWmjfu/exec';
+
+async function submitInspection() {
+  // Only send items that have a status selected
+  const payload = issues.filter(i => i.status);
+
+  if (!payload.length) {
+    alert('No items have a status yet.');
+    return;
+  }
+
+  try {
+    // Show a very basic loading state
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = 'Submitting...';
+
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    alert('Inspection submitted to Google Sheet!');
+
+    // (Optional) Clear statuses after submit:
+    // payload.forEach(item => {
+    //   item.status = null;
+    //   item.photoDataUrl = '';
+    // });
+    // saveIssues();
+    // renderIssueList();
+
+  } catch (err) {
+    console.error(err);
+    alert('Error submitting inspection. Check console for details.');
+  } finally {
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = 'Submit';
+  }
+}
+
+// Attach handler
+document.getElementById('submitBtn').addEventListener('click', submitInspection);
 
     /****************************
      * 5. INITIAL RENDER
