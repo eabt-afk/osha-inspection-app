@@ -5,22 +5,17 @@
   <title>OSHA Self-Inspection</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    /* Basic reset */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: system-ui, sans-serif;
       background: #f5f5f5;
       color: #222;
       padding: 0.75rem;
     }
 
     .app-shell {
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
       background: #fff;
       border-radius: 12px;
@@ -28,7 +23,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      height: 90vh;
+      height: 92vh;
     }
 
     header {
@@ -39,15 +34,8 @@
       justify-content: space-between;
     }
 
-    header h1 {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    header small {
-      font-size: 0.75rem;
-      color: #666;
-    }
+    header h1 { font-size: 1rem; font-weight: 600; }
+    header small { font-size: 0.75rem; color: #666; }
 
     .filters {
       display: flex;
@@ -74,15 +62,9 @@
       border-color: #0070f3;
     }
 
-    .list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0.5rem 0.5rem 0.75rem 1rem;
-    }
+    .list { flex: 1; overflow-y: auto; padding: 0.5rem 1rem; }
 
-    .category-group {
-      margin-bottom: 0.75rem;
-    }
+    .category-group { margin-bottom: 0.75rem; }
 
     .category-title {
       font-size: 0.75rem;
@@ -95,38 +77,20 @@
     .issue-row {
       background: #fafafa;
       border-radius: 8px;
-      padding: 0.5rem 0.5rem;
+      padding: 0.5rem;
       margin-bottom: 0.4rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
       cursor: pointer;
     }
 
-    .issue-text {
-      font-size: 0.85rem;
-      line-height: 1.3;
-      flex: 1;
-    }
+    .issue-text { font-size: 0.85rem; flex: 1; }
+    .issue-status-icon { font-size: 1.1rem; width: 2rem; text-align: right; }
 
-    .issue-status-icon {
-      font-size: 1.1rem;
-      min-width: 1.6rem;
-      text-align: right;
-    }
-
-    .status-compliant {
-      color: #16a34a; /* green */
-    }
-
-    .status-needs_attention {
-      color: #dc2626; /* red */
-    }
-
-    .status-na {
-      color: #6b7280; /* gray */
-    }
+    .status-compliant { color: #16a34a; }
+    .status-needs_attention { color: #dc2626; }
+    .status-na { color: #6b7280; }
 
     /* Detail panel */
     .detail-backdrop {
@@ -139,9 +103,7 @@
       z-index: 10;
     }
 
-    .detail-backdrop.open {
-      display: flex;
-    }
+    .detail-backdrop.open { display: flex; }
 
     .detail-panel {
       background: #fff;
@@ -149,7 +111,7 @@
       max-width: 600px;
       border-radius: 16px 16px 0 0;
       box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
-      padding: 1rem 1rem 1.25rem;
+      padding: 1rem;
       max-height: 80vh;
       display: flex;
       flex-direction: column;
@@ -157,138 +119,53 @@
       overflow-y: auto;
     }
 
-    .detail-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .detail-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
+    .detail-title { font-size: 0.95rem; font-weight: 600; }
     .badge {
       font-size: 0.7rem;
       padding: 0.15rem 0.5rem;
       border-radius: 999px;
       background: #eef2ff;
       color: #3730a3;
-      white-space: nowrap;
     }
 
     .detail-full-issue {
       font-size: 0.85rem;
-      line-height: 1.4;
       background: #f9fafb;
+      padding: 0.5rem;
       border-radius: 8px;
-      padding: 0.5rem 0.6rem;
     }
 
-    .status-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .status-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .status-buttons {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-    }
-
+    .status-buttons { display: flex; gap: 0.4rem; }
     .status-btn {
       flex: 1;
-      min-width: 5rem;
       border-radius: 999px;
-      padding: 0.25rem 0.5rem;
+      padding: 0.35rem;
       font-size: 0.8rem;
       border: 1px solid #ddd;
       background: #fff;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25rem;
     }
-
     .status-btn.active {
       border-color: #0070f3;
       background: #e0f2fe;
       color: #0369a1;
-      font-weight: 600;
     }
 
-    .photo-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
+    .photo-preview { display: none; max-width: 100%; border-radius: 8px; }
+    .photo-preview.visible { display: block; }
 
-    .photo-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
+    .detail-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+    .btn { padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.8rem; cursor: pointer; }
+    .btn-secondary { background: #e5e7eb; }
+    .btn-primary { background: #0070f3; color: #fff; }
 
-    .photo-preview {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-top: 0.25rem;
-      display: none;
-    }
-
-    .photo-preview.visible {
-      display: block;
-    }
-
-    .detail-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-
-    .btn {
-      font-size: 0.8rem;
-      padding: 0.35rem 0.9rem;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    .btn-primary {
-      background: #0070f3;
-      color: #fff;
-    }
-
-    @media (min-width: 700px) {
-      .app-shell {
-        height: 85vh;
-      }
-      .detail-panel {
-        border-radius: 16px;
-        margin-bottom: 2rem;
-      }
-      .detail-backdrop {
-        align-items: center;
-      }
-    }
   </style>
 </head>
+
 <body>
-  <div class="app-shell">
-  <header>
+<div class="app-shell">
+
+<header>
   <div>
     <h1>OSHA Self-Inspection</h1>
     <small>Tap an item to update status & add photos</small>
@@ -298,470 +175,314 @@
   </button>
 </header>
 
-    <div class="filters" id="filters"></div>
+<div class="filters" id="filters"></div>
+<div class="list" id="issueList"></div>
 
-    <div class="list" id="issueList"></div>
-  </div>
+</div> <!-- end app shell -->
 
-  <!-- Detail / Form Panel -->
-  <div class="detail-backdrop" id="detailBackdrop">
-    <div class="detail-panel">
-      <div class="detail-header">
-        <div class="detail-title" id="detailShortIssue"></div>
-        <span class="badge" id="detailCategory"></span>
-      </div>
-      <div class="detail-full-issue" id="detailFullIssue"></div>
+<!-- Detail form modal -->
+<div class="detail-backdrop" id="detailBackdrop">
+  <div class="detail-panel">
 
-      <div class="status-group">
-        <div class="status-label">Status</div>
-        <div class="status-buttons">
-          <button class="status-btn" data-status="compliant" id="btnCompliant">✔ Compliant</button>
-          <button class="status-btn" data-status="needs_attention" id="btnNeedsAttention">❌ Needs attention</button>
-          <button class="status-btn" data-status="na" id="btnNA">➖ N/A</button>
-        </div>
-      </div>
+    <div class="detail-header">
+      <div class="detail-title" id="detailShortIssue"></div>
+      <span class="badge" id="detailCategory"></span>
+    </div>
 
-      <div class="photo-group">
-        <div class="photo-label">Photo (optional)</div>
-        <input type="file" id="photoInput" accept="image/*" />
-        <img id="photoPreview" class="photo-preview" alt="Issue photo preview" />
-      </div>
+    <div class="detail-full-issue" id="detailFullIssue"></div>
 
-      <div class="detail-actions">
-        <button class="btn btn-secondary" id="btnCancel">Cancel</button>
-        <button class="btn btn-primary" id="btnSave">Save</button>
+    <div>
+      <div class="status-label">Status</div>
+      <div class="status-buttons">
+        <button class="status-btn" data-status="compliant" id="btnCompliant">✔ Compliant</button>
+        <button class="status-btn" data-status="needs_attention" id="btnNeedsAttention">❌ Needs Attention</button>
+        <button class="status-btn" data-status="na" id="btnNA">➖ N/A</button>
       </div>
     </div>
+
+    <div class="photo-group">
+      <div class="photo-label">Photo (optional)</div>
+      <input type="file" id="photoInput" accept="image/*">
+      <img id="photoPreview" class="photo-preview">
+    </div>
+
+    <div class="detail-actions">
+      <button class="btn btn-secondary" id="btnCancel">Cancel</button>
+      <button class="btn btn-primary" id="btnSave">Save</button>
+    </div>
+
   </div>
+</div>
 
-  <script>
-    /****************************
-     * 1. INITIAL DATA (sample)
-     * Replace `initialIssues` with CSV→JSON converted list.
-     ****************************/
-    const initialIssues = [
-  {
-    "ID": "1",
-    "Category": "Housekeeping",
-    "Short Issue": "Adequate workspace around electrical equipment",
-    "Issue": "Is sufficient access and working space provided and maintained about all electrical equipment to permit ready and safe operations and maintenance (36”)? 29 CFR 1910.303"
-  },
-  {
-    "ID": "2",
-    "Category": "EAP",
-    "Short Issue": "Clear exit signs, lighting, and routes",
-    "Issue": "Are exits clearly marked “EXIT” and exit routes adequately lit? Access/egress routes are clear and unobstructed? 29 CFR 1910.37"
-  },
-  {
-    "ID": "3",
-    "Category": "EAP",
-    "Short Issue": "Accessible and inspected fire extinguishers",
-    "Issue": "Appropriate fire extinguishers are readily accessible; noted in good condition; tagged; and inspected (annual, monthly)? 29 CFR 1910.157"
-  },
-  {
-    "ID": "4",
-    "Category": "Fire Protection",
-    "Short Issue": "Gas cylinders stored securely, capped",
-    "Issue": "Cylinders are stored properly (e.g. upright position, caps in place, protected from falling)? 29 CFR 1910.253"
-  },
-  {
-    "ID": "5",
-    "Category": "Fire Protection",
-    "Short Issue": "Flammable liquids within allowed quantities",
-    "Issue": "The incidental use of flammable and combustibles is properly stored? [ • 25 gallons of Class IA in containers; • 120 gallons of Class IB, IC, II, or III in containers; • 660 gallons of Class IB, IC, II, or III in a single portable tank ] 29 CFR 1910.106"
-  },
-  {
-    "ID": "6",
-    "Category": "Fire Protection",
-    "Short Issue": "Torch flashback arrestors installed",
-    "Issue": "Flashback arrestors are used on burning torches to prevent flashback into the compressed gas tanks? 29 CFR 1910.253"
-  },
-  {
-    "ID": "8",
-    "Category": "LOTO",
-    "Short Issue": "Bench grinders properly guarded",
-    "Issue": "Are bench grinders guarded and compliant with OSHA standards [ work rest - 1/8-inch; adjustable tongue guard - 1/4-inch ]? 29 CFR 1910.215"
-  },
-  {
-    "ID": "9",
-    "Category": "LOTO",
-    "Short Issue": "Lockout/tagout performed correctly",
-    "Issue": "LO/TO is performed correctly / using correct LO/TO equipment? 29 CFR 1910.147"
-  },
-  {
-    "ID": "10",
-    "Category": "LOTO",
-    "Short Issue": "Written procedures and inspections for LO/TO",
-    "Issue": "There is a LO/TO program that includes a written program, machine-specific procedures, and periodic inspections? 29 CFR 1910.147"
-  },
-  {
-    "ID": "11",
-    "Category": "PPE",
-    "Short Issue": "PPE hazard assessment completed",
-    "Issue": "A PPE hazard assessment has been completed to determine if hazards are present, or are likely to be present, which necessitate the use of PPE? 29 CFR 1910.132"
-  },
-  {
-    "ID": "12",
-    "Category": "Hazard Communication",
-    "Short Issue": "Proper chemical container labeling",
-    "Issue": "Containers of hazardous chemicals in the workplace are labeled, tagged, or marked identifying the chemical it contains as well as the appropriate hazard warnings? 29 CFR 1910.1200"
-  },
-  {
-    "ID": "13",
-    "Category": "Hazard Communication",
-    "Short Issue": "SDS available for all chemicals",
-    "Issue": "Safety Data Sheets (SDSs) are in place for materials/chemicals on-site and are readily accessible to all employees? 29 CFR 1910.1200"
-  },
-  {
-    "ID": "14",
-    "Category": "Hazard Communication",
-    "Short Issue": "Employees trained on HazCom/GHS",
-    "Issue": "Employees have been trained on Hazard Communication /Globally Harmonized System (GHS)? 29 CFR 1910.1200"
-  },
-  {
-    "ID": "15",
-    "Category": "Electrical",
-    "Short Issue": "Flexible cords in good condition",
-    "Issue": "Flexible cords and cables appeared in good condition (ground pin in place, free of splices, insulation)? 29 CFR 1910.305"
-  },
-  {
-    "ID": "16",
-    "Category": "Electrical",
-    "Short Issue": "Proper use of temporary wiring",
-    "Issue": "Temporary wiring is only used for construction, remodeling, maintenance, repair, or demolition of buildings, structures, or equipment, and similar activities? 29 CFR 1910.305"
-  },
-  {
-    "ID": "17",
-    "Category": "Walking-Working Surfaces/Fall Protection",
-    "Short Issue": "Fall protection for heights over 4 feet",
-    "Issue": "Personnel are protected (guardrails, personal fall arrest equipment) from any fall hazards over 4 feet? 29 CFR 1910.23"
-  },
-  {
-    "ID": "18",
-    "Category": "Walking-Working Surfaces/Fall Protection",
-    "Short Issue": "Self-closing gates at ladder openings",
-    "Issue": "Self-closing gates are used at fixed ladder opening and other similar openings? 29 CFR 1910.28"
-  },
-  {
-    "ID": "19",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "Forklifts operated safely",
-    "Issue": "Powered industrial truck(s) were operated in a safe manner (i.e. seat belt, safe speed, clear view, etc.) at time of evaluation? 29 CFR 1910.178"
-  },
-  {
-    "ID": "20",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "Wheel chocks used when unloading",
-    "Issue": "Wheel chocks are available and/or in use to prevent the trucks from rolling while they are boarded with powered industrial trucks? 29 CFR 1910.178"
-  },
-  {
-    "ID": "21",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Annual MEWP inspection within timeframe",
-    "Issue": "An annual inspection is performed no later than thirteen (13) months from the date of the prior annual inspection? ANSI A92.22"
-  },
-  {
-    "ID": "22",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Safe operation of MEWPs",
-    "Issue": "MEWPs were operated in a safe manner (i.e. fall protection, on floor of basket, safe path of travel, proper clearances, etc.) at time of evaluation?"
-  },
-  {
-    "ID": "23",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Proper training on MEWPs",
-    "Issue": "Have all authorized operators and occupants been properly trained? 29 CFR 1926.454"
-  },
-  {
-    "ID": "24",
-    "Category": "Tools & Equipment",
-    "Short Issue": "Hand tools in safe condition",
-    "Issue": "Hand tools appear to be in safe condition with guards in place? 29 CFR 1910.242"
-  }
-]
-    ;
+<script>
+/* -----------------------------------------------
+   1) RAW DATA FROM YOUR JSON (unaltered)
+------------------------------------------------ */
+const rawIssues = [
+  {"ID":"1","Category":"Housekeeping","Short Issue":"Adequate workspace around electrical equipment","Issue":"Is sufficient access and working space provided and maintained about all electrical equipment to permit ready and safe operations and maintenance (36”)? 29 CFR 1910.303"},
+  {"ID":"2","Category":"EAP","Short Issue":"Clear exit signs, lighting, and routes","Issue":"Are exits clearly marked “EXIT” and exit routes adequately lit? Access/egress routes are clear and unobstructed? 29 CFR 1910.37"},
+  {"ID":"3","Category":"EAP","Short Issue":"Accessible and inspected fire extinguishers","Issue":"Appropriate fire extinguishers are readily accessible; noted in good condition; tagged; and inspected (annual, monthly)? 29 CFR 1910.157"},
+  {"ID":"4","Category":"Fire Protection","Short Issue":"Gas cylinders stored securely, capped","Issue":"Cylinders are stored properly (e.g. upright position, caps in place, protected from falling)? 29 CFR 1910.253"},
+  {"ID":"5","Category":"Fire Protection","Short Issue":"Flammable liquids within allowed quantities","Issue":"The incidental use of flammable and combustibles is properly stored? [ • 25 gallons of Class IA in containers; • 120 gallons of Class IB, IC, II, or III in containers; • 660 gallons of Class IB, IC, II, or III in a single portable tank ] 29 CFR 1910.106"},
+  {"ID":"6","Category":"Fire Protection","Short Issue":"Torch flashback arrestors installed","Issue":"Flashback arrestors are used on burning torches to prevent flashback into the compressed gas tanks? 29 CFR 1910.253"},
+  {"ID":"8","Category":"LOTO","Short Issue":"Bench grinders properly guarded","Issue":"Are bench grinders guarded and compliant with OSHA standards [ work rest - 1/8-inch; adjustable tongue guard - 1/4-inch ]? 29 CFR 1910.215"},
+  {"ID":"9","Category":"LOTO","Short Issue":"Lockout/tagout performed correctly","Issue":"LO/TO is performed correctly / using correct LO/TO equipment? 29 CFR 1910.147"},
+  {"ID":"10","Category":"LOTO","Short Issue":"Written procedures and inspections for LO/TO","Issue":"There is a LO/TO program that includes a written program, machine-specific procedures, and periodic inspections? 29 CFR 1910.147"},
+  {"ID":"11","Category":"PPE","Short Issue":"PPE hazard assessment completed","Issue":"A PPE hazard assessment has been completed to determine if hazards are present, or are likely to be present, which necessitate the use of PPE? 29 CFR 1910.132"},
+  {"ID":"12","Category":"Hazard Communication","Short Issue":"Proper chemical container labeling","Issue":"Containers of hazardous chemicals in the workplace are labeled, tagged, or marked identifying the chemical it contains as well as the appropriate hazard warnings? 29 CFR 1910.1200"},
+  {"ID":"13","Category":"Hazard Communication","Short Issue":"SDS available for all chemicals","Issue":"Safety Data Sheets (SDSs) are in place for materials/chemicals on-site and are readily accessible to all employees? 29 CFR 1910.1200"},
+  {"ID":"14","Category":"Hazard Communication","Short Issue":"Employees trained on HazCom/GHS","Issue":"Employees have been trained on Hazard Communication /Globally Harmonized System (GHS)? 29 CFR 1910.1200"},
+  {"ID":"15","Category":"Electrical","Short Issue":"Flexible cords in good condition","Issue":"Flexible cords and cables appeared in good condition (ground pin in place, free of splices, insulation)? 29 CFR 1910.305"},
+  {"ID":"16","Category":"Electrical","Short Issue":"Proper use of temporary wiring","Issue":"Temporary wiring is only used for construction, remodeling, maintenance, repair, or demolition of buildings, structures, or equipment, and similar activities? 29 CFR 1910.305"},
+  {"ID":"17","Category":"Walking-Working Surfaces/Fall Protection","Short Issue":"Fall protection for heights over 4 feet","Issue":"Personnel are protected (guardrails, personal fall arrest equipment) from any fall hazards over 4 feet? 29 CFR 1910.23"},
+  {"ID":"18","Category":"Walking-Working Surfaces/Fall Protection","Short Issue":"Self-closing gates at ladder openings","Issue":"Self-closing gates are used at fixed ladder opening and other similar openings? 29 CFR 1910.28"},
+  {"ID":"19","Category":"Material Handling / Powered Industrial Trucks (Forklifts)","Short Issue":"Forklifts operated safely","Issue":"Powered industrial truck(s) were operated in a safe manner (i.e. seat belt, safe speed, clear view, etc.) at time of evaluation? 29 CFR 1910.178"},
+  {"ID":"20","Category":"Material Handling / Powered Industrial Trucks (Forklifts)","Short Issue":"Wheel chocks used when unloading","Issue":"Wheel chocks are available and/or in use to prevent the trucks from rolling while they are boarded with powered industrial trucks? 29 CFR 1910.178"},
+  {"ID":"21","Category":"Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift","Short Issue":"Annual MEWP inspection within timeframe","Issue":"An annual inspection is performed no later than thirteen (13) months from the date of the prior annual inspection? ANSI A92.22"},
+  {"ID":"22","Category":"Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift","Short Issue":"Safe operation of MEWPs","Issue":"MEWPs were operated in a safe manner (i.e. fall protection, on floor of basket, safe path of travel, proper clearances, etc.) at time of evaluation?"},
+  {"ID":"23","Category":"Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift","Short Issue":"Proper training on MEWPs","Issue":"Have all authorized operators and occupants been properly trained? 29 CFR 1926.454"},
+  {"ID":"24","Category":"Tools & Equipment","Short Issue":"Hand tools in safe condition","Issue":"Hand tools appear to be in safe condition with guards in place? 29 CFR 1910.242"}
+];
 
-    const STORAGE_KEY = "osha_inspection_issues_v1";
+/* -----------------------------------------------
+   2) MAP INTO THE FORMAT THE APP USES
+------------------------------------------------ */
+const initialIssues = rawIssues.map(r => ({
+  id: Number(r.ID),
+  category: r.Category,
+  shortIssue: r["Short Issue"],
+  fullIssue: r.Issue,
+  status: null,
+  photoDataUrl: ""
+}));
 
-    function loadIssues() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          // merge structure in case you add new issues later
-          return initialIssues.map(base => {
-            const found = parsed.find(p => p.id === base.id);
-            return found ? found : base;
-          });
-        } catch (e) {
-          console.warn("Failed to parse saved issues, using defaults.", e);
-        }
-      }
-      return initialIssues;
-    }
+/* -----------------------------------------------
+   3) STORAGE + APP STATE
+------------------------------------------------ */
+const STORAGE_KEY = "osha_inspection_app_v1";
 
-    function saveIssues() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
-    }
-
-    let issues = loadIssues();
-    let currentIssueId = null;
-    let currentFilter = "All";
-
-    /****************************
-     * 2. RENDER FILTER CHIPS
-     ****************************/
-    const filtersContainer = document.getElementById("filters");
-
-    function getCategories() {
-      const set = new Set(issues.map(i => i.category));
-      return ["All", ...Array.from(set)];
-    }
-
-    function renderFilters() {
-      filtersContainer.innerHTML = "";
-      const cats = getCategories();
-      cats.forEach(cat => {
-        const chip = document.createElement("button");
-        chip.className = "filter-chip" + (cat === currentFilter ? " active" : "");
-        chip.textContent = cat;
-        chip.addEventListener("click", () => {
-          currentFilter = cat;
-          renderFilters();
-          renderIssueList();
-        });
-        filtersContainer.appendChild(chip);
-      });
-    }
-
-    /****************************
-     * 3. RENDER ISSUE LIST
-     ****************************/
-    const issueListEl = document.getElementById("issueList");
-
-    function statusToIconClass(status) {
-      if (status === "compliant") return "status-compliant";
-      if (status === "needs_attention") return "status-needs_attention";
-      if (status === "na") return "status-na";
-      return "";
-    }
-
-    function statusToSymbol(status) {
-      if (status === "compliant") return "✔";
-      if (status === "needs_attention") return "✖";
-      if (status === "na") return "➖";
-      return "•";
-    }
-
-    function renderIssueList() {
-      issueListEl.innerHTML = "";
-
-      // filter
-      let filtered = issues;
-      if (currentFilter !== "All") {
-        filtered = issues.filter(i => i.category === currentFilter);
-      }
-
-      // group by category
-      const byCat = {};
-      filtered.forEach(issue => {
-        byCat[issue.category] = byCat[issue.category] || [];
-        byCat[issue.category].push(issue);
-      });
-
-      Object.keys(byCat).sort().forEach(cat => {
-        const group = document.createElement("div");
-        group.className = "category-group";
-
-        const title = document.createElement("div");
-        title.className = "category-title";
-        title.textContent = cat;
-        group.appendChild(title);
-
-        byCat[cat].forEach(issue => {
-          const row = document.createElement("div");
-          row.className = "issue-row";
-
-          const txt = document.createElement("div");
-          txt.className = "issue-text";
-          txt.textContent = issue.shortIssue;
-          row.appendChild(txt);
-
-          const icon = document.createElement("div");
-          icon.className = "issue-status-icon " + statusToIconClass(issue.status);
-          icon.textContent = statusToSymbol(issue.status);
-          row.appendChild(icon);
-
-          row.addEventListener("click", () => openDetail(issue.id));
-          group.appendChild(row);
-        });
-
-        issueListEl.appendChild(group);
-      });
-    }
-
-    /****************************
-     * 4. DETAIL / FORM LOGIC
-     ****************************/
-    const detailBackdrop = document.getElementById("detailBackdrop");
-    const detailShortIssue = document.getElementById("detailShortIssue");
-    const detailCategory = document.getElementById("detailCategory");
-    const detailFullIssue = document.getElementById("detailFullIssue");
-    const btnCompliant = document.getElementById("btnCompliant");
-    const btnNeedsAttention = document.getElementById("btnNeedsAttention");
-    const btnNA = document.getElementById("btnNA");
-    const photoInput = document.getElementById("photoInput");
-    const photoPreview = document.getElementById("photoPreview");
-    const btnCancel = document.getElementById("btnCancel");
-    const btnSave = document.getElementById("btnSave");
-
-    let tempStatus = null;
-    let tempPhotoDataUrl = "";
-
-    function setStatusButtons(status) {
-      [btnCompliant, btnNeedsAttention, btnNA].forEach(btn => {
-        btn.classList.remove("active");
-      });
-      if (status === "compliant") btnCompliant.classList.add("active");
-      if (status === "needs_attention") btnNeedsAttention.classList.add("active");
-      if (status === "na") btnNA.classList.add("active");
-    }
-
-    function openDetail(id) {
-      currentIssueId = id;
-      const issue = issues.find(i => i.id === id);
-      if (!issue) return;
-
-      // populate UI
-      detailShortIssue.textContent = issue.shortIssue;
-      detailCategory.textContent = issue.category;
-      detailFullIssue.textContent = issue.fullIssue;
-
-      tempStatus = issue.status || null;
-      tempPhotoDataUrl = issue.photoDataUrl || "";
-
-      setStatusButtons(tempStatus);
-
-      if (tempPhotoDataUrl) {
-        photoPreview.src = tempPhotoDataUrl;
-        photoPreview.classList.add("visible");
-      } else {
-        photoPreview.src = "";
-        photoPreview.classList.remove("visible");
-      }
-      photoInput.value = "";
-
-      detailBackdrop.classList.add("open");
-    }
-
-    function closeDetail() {
-      currentIssueId = null;
-      detailBackdrop.classList.remove("open");
-    }
-
-    // Status button handlers
-    btnCompliant.addEventListener("click", () => {
-      tempStatus = "compliant";
-      setStatusButtons(tempStatus);
-    });
-    btnNeedsAttention.addEventListener("click", () => {
-      tempStatus = "needs_attention";
-      setStatusButtons(tempStatus);
-    });
-    btnNA.addEventListener("click", () => {
-      tempStatus = "na";
-      setStatusButtons(tempStatus);
-    });
-
-    // Photo upload handler
-    photoInput.addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        tempPhotoDataUrl = evt.target.result;
-        photoPreview.src = tempPhotoDataUrl;
-        photoPreview.classList.add("visible");
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Cancel / Save
-    btnCancel.addEventListener("click", closeDetail);
-
-    btnSave.addEventListener("click", () => {
-      if (!currentIssueId) return;
-      const idx = issues.findIndex(i => i.id === currentIssueId);
-      if (idx === -1) return;
-
-      issues[idx].status = tempStatus;
-      issues[idx].photoDataUrl = tempPhotoDataUrl;
-
-      saveIssues();
-      renderIssueList();
-      closeDetail();
-    });
-
-    // Close on backdrop click
-    detailBackdrop.addEventListener("click", e => {
-      if (e.target === detailBackdrop) {
-        closeDetail();
-      }
-    });
-/****************************
- * 6. SUBMIT TO GOOGLE SHEET
- ****************************/
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWiB8fjM-AcuJJCvtaS6pa9vAtqFqnqPk5h0TJtIQDZOVT0wknPAvJeR6F-zTWmjfu/exec';
-
-async function submitInspection() {
-  // Only send items that have a status selected
-  const payload = issues.filter(i => i.status);
-
-  if (!payload.length) {
-    alert('No items have a status yet.');
-    return;
-  }
-
+function loadIssues() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return initialIssues;
   try {
-    // Show a very basic loading state
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').textContent = 'Submitting...';
-
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    alert('Inspection submitted to Google Sheet!');
-
-    // (Optional) Clear statuses after submit:
-    // payload.forEach(item => {
-    //   item.status = null;
-    //   item.photoDataUrl = '';
-    // });
-    // saveIssues();
-    // renderIssueList();
-
-  } catch (err) {
-    console.error(err);
-    alert('Error submitting inspection. Check console for details.');
-  } finally {
-    document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').textContent = 'Submit';
+    const parsed = JSON.parse(saved);
+    return initialIssues.map(base => parsed.find(p => p.id === base.id) || base);
+  } catch {
+    return initialIssues;
   }
 }
 
-// Attach handler
-document.getElementById('submitBtn').addEventListener('click', submitInspection);
+function saveIssues() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
+}
 
-    /****************************
-     * 5. INITIAL RENDER
-     ****************************/
-    renderFilters();
+let issues = loadIssues();
+let currentIssueId = null;
+let currentFilter = "All";
+
+/* -----------------------------------------------
+   4) FILTERS
+------------------------------------------------ */
+const filtersContainer = document.getElementById("filters");
+
+function getCategories() {
+  return ["All", ...new Set(issues.map(i => i.category))];
+}
+
+function renderFilters() {
+  filtersContainer.innerHTML = "";
+  getCategories().forEach(cat => {
+    const chip = document.createElement("button");
+    chip.className = "filter-chip" + (cat === currentFilter ? " active" : "");
+    chip.textContent = cat;
+    chip.onclick = () => { currentFilter = cat; renderFilters(); renderIssueList(); };
+    filtersContainer.appendChild(chip);
+  });
+}
+
+/* -----------------------------------------------
+   5) ISSUE LIST
+------------------------------------------------ */
+const issueListEl = document.getElementById("issueList");
+
+function statusToSymbol(s) {
+  if (s === "compliant") return "✔";
+  if (s === "needs_attention") return "✖";
+  if (s === "na") return "➖";
+  return "•";
+}
+function statusToClass(s) {
+  if (s === "compliant") return "status-compliant";
+  if (s === "needs_attention") return "status-needs_attention";
+  if (s === "na") return "status-na";
+  return "";
+}
+
+function renderIssueList() {
+  issueListEl.innerHTML = "";
+
+  let filtered = currentFilter === "All"
+    ? issues
+    : issues.filter(i => i.category === currentFilter);
+
+  const grouped = {};
+  filtered.forEach(i => { (grouped[i.category] ||= []).push(i); });
+
+  Object.keys(grouped).forEach(cat => {
+    const group = document.createElement("div");
+    group.className = "category-group";
+
+    const title = document.createElement("div");
+    title.className = "category-title";
+    title.textContent = cat;
+    group.appendChild(title);
+
+    grouped[cat].forEach(issue => {
+      const row = document.createElement("div");
+      row.className = "issue-row";
+      row.onclick = () => openDetail(issue.id);
+
+      row.innerHTML = `
+        <div class="issue-text">${issue.shortIssue}</div>
+        <div class="issue-status-icon ${statusToClass(issue.status)}">
+          ${statusToSymbol(issue.status)}
+        </div>
+      `;
+
+      group.appendChild(row);
+    });
+
+    issueListEl.appendChild(group);
+  });
+}
+
+/* -----------------------------------------------
+   6) DETAIL MODAL LOGIC
+------------------------------------------------ */
+const detailBackdrop = document.getElementById("detailBackdrop");
+const detailShortIssue = document.getElementById("detailShortIssue");
+const detailCategory = document.getElementById("detailCategory");
+const detailFullIssue = document.getElementById("detailFullIssue");
+const btnCompliant = document.getElementById("btnCompliant");
+const btnNeedsAttention = document.getElementById("btnNeedsAttention");
+const btnNA = document.getElementById("btnNA");
+const photoInput = document.getElementById("photoInput");
+const photoPreview = document.getElementById("photoPreview");
+
+let tempStatus = null;
+let tempPhotoDataUrl = "";
+
+function openDetail(id) {
+  currentIssueId = id;
+  const issue = issues.find(i => i.id === id);
+
+  detailShortIssue.textContent = issue.shortIssue;
+  detailCategory.textContent = issue.category;
+  detailFullIssue.textContent = issue.fullIssue;
+
+  tempStatus = issue.status;
+  tempPhotoDataUrl = issue.photoDataUrl;
+
+  setStatusButtons(tempStatus);
+
+  if (tempPhotoDataUrl) {
+    photoPreview.src = tempPhotoDataUrl;
+    photoPreview.classList.add("visible");
+  } else {
+    photoPreview.classList.remove("visible");
+  }
+
+  photoInput.value = "";
+  detailBackdrop.classList.add("open");
+}
+
+function closeDetail() {
+  detailBackdrop.classList.remove("open");
+  currentIssueId = null;
+}
+
+document.getElementById("btnCancel").onclick = closeDetail;
+
+btnCompliant.onclick = () => { tempStatus = "compliant"; setStatusButtons(tempStatus); };
+btnNeedsAttention.onclick = () => { tempStatus = "needs_attention"; setStatusButtons(tempStatus); };
+btnNA.onclick = () => { tempStatus = "na"; setStatusButtons(tempStatus); };
+
+function setStatusButtons(s) {
+  [btnCompliant, btnNeedsAttention, btnNA].forEach(b => b.classList.remove("active"));
+  if (s === "compliant") btnCompliant.classList.add("active");
+  if (s === "needs_attention") btnNeedsAttention.classList.add("active");
+  if (s === "na") btnNA.classList.add("active");
+}
+
+photoInput.onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = evt => {
+    tempPhotoDataUrl = evt.target.result;
+    photoPreview.src = tempPhotoDataUrl;
+    photoPreview.classList.add("visible");
+  };
+  reader.readAsDataURL(file);
+};
+
+document.getElementById("btnSave").onclick = () => {
+  const i = issues.findIndex(i => i.id === currentIssueId);
+  if (i >= 0) {
+    issues[i].status = tempStatus;
+    issues[i].photoDataUrl = tempPhotoDataUrl;
+    saveIssues();
     renderIssueList();
-  </script>
+  }
+  closeDetail();
+};
+
+detailBackdrop.onclick = e => {
+  if (e.target === detailBackdrop) closeDetail();
+};
+
+/* -----------------------------------------------
+   7) SUBMIT TO GOOGLE SHEET
+------------------------------------------------ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWiB8fjM-AcuJJCvtaS6pa9vAtqFqnqPk5h0TJtIQDZOVT0wknPAvJeR6F-zTWmjfu/exec";
+
+async function submitInspection() {
+  const payload = issues.filter(i => i.status);
+
+  if (!payload.length) {
+    alert("No items have a status yet.");
+    return;
+  }
+
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    alert("Inspection submitted!");
+  } catch (err) {
+    alert("Error submitting inspection.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Submit";
+  }
+}
+
+document.getElementById("submitBtn").onclick = submitInspection;
+
+/* -----------------------------------------------
+   8) INITIAL RENDER
+------------------------------------------------ */
+renderFilters();
+renderIssueList();
+</script>
+
 </body>
 </html>
