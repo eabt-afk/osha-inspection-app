@@ -53,7 +53,7 @@
       display: flex;
       gap: 0.6rem;
       flex-wrap: wrap;
-      margin-top: 0. AttachShadow issue; 
+      margin-top: 0.6rem; /* ✅ FIXED (was broken CSS) */
     }
 
     label {
@@ -396,19 +396,11 @@
     let QUESTION_BANK = [];
     let LOGIC_RULES = [];
 
-    // active question list for current area (includes questions that *may* be hidden by logic)
     let questions = [];
-
-    // answers keyed by question id: {status, comments, photos[]}
     let answers = new Map();
-
-    // set of followup groups currently hidden
     let hiddenGroups = new Set();
-
-    // wizard position
     let idx = 0;
 
-    // session info
     let session = {
       areaId: "",
       areaName: "",
@@ -421,9 +413,34 @@
      ********************/
     function safeTrim(v){ return String(v ?? "").trim(); }
     function isTrue(v){ return String(v ?? "").toUpperCase() === "TRUE"; }
+    function clearAnswersForGroup(groupName) {
+  if (!groupName) return;
 
-    // Convert any legacy trigger/status values into yes/no/na
+  // Remove any saved answers for questions in this followup group
+  questions.forEach(q => {
+    if (!q) return;
+    if (q.followupGroup === groupName) {
+      answers.delete(q.id);
+    }
+  });
 
+  // If the current question is now hidden, jump to next visible
+  const cq = currentQuestion();
+  if (cq && isHiddenByLogic(cq)) {
+    const next = findNextIndex(idx, +1);
+    const prev = findNextIndex(idx, -1);
+    if (next !== -1) idx = next;
+    else if (prev !== -1) idx = prev;
+  }
+}
+
+    // ✅ Sheet-native status normalization:
+    // Accepts "yes", "no", "na" (also tolerates "n/a")
+    function normalizeSheetStatus(v){
+      const s = String(v ?? "").toLowerCase().trim();
+      if (s === "n/a") return "na";
+      return s;
+    }
 
     function setStage(which){
       if (which === "setup") {
@@ -438,7 +455,6 @@
     }
 
     function apiGet(action){
-      // JSONP (works from GitHub Pages)
       return new Promise((resolve, reject) => {
         const cb = "cb_" + action + "_" + Math.random().toString(36).slice(2);
         const script = document.createElement("script");
@@ -484,7 +500,6 @@
         idx = Number(parsed.idx || 0);
         hiddenGroups = new Set(parsed.hiddenGroups || []);
         answers = new Map(parsed.answers || []);
-
         return true;
       } catch {
         return false;
@@ -503,6 +518,7 @@
       setupHint.textContent = "";
       setStage("setup");
     }
+    
 
     /********************
      * NORMALIZE SHEET ROWS
@@ -517,8 +533,6 @@
     }
 
     function normalizeQuestionRow(r){
-      // Expected headers in Question_Bank:
-      // ID, Category, ShortIssue, FullIssue, Area_Tags, Active, Followup_Group, Order, etc.
       const id = Number(safeTrim(r.ID));
       return {
         id,
@@ -535,9 +549,9 @@
     function normalizeLogicRow(r){
       return {
         triggerId: Number(safeTrim(r.Trigger_Question_ID)),
-        triggerStatus: normalizeStatus(r.Trigger_Status),
+        triggerStatus: normalizeSheetStatus(r.Trigger_Status), // ✅ yes/no/na
         affectedGroup: safeTrim(r.Affected_Group),
-        action: safeTrim(r.Action).toUpperCase()
+        action: safeTrim(r.Action).toUpperCase()              // SHOW/HIDE
       };
     }
 
@@ -561,7 +575,6 @@
         .filter(q => questionAppliesToArea(q, areaId))
         .sort((a,b) => a.order - b.order);
 
-      // Clamp idx to range
       if (idx < 0) idx = 0;
       if (idx >= questions.length) idx = Math.max(questions.length - 1, 0);
     }
@@ -579,7 +592,6 @@
     }
 
     function findNextIndex(fromIdx, direction){
-      // direction: +1 or -1
       let i = fromIdx;
       while (true) {
         i += direction;
@@ -614,11 +626,8 @@
       backBtn.disabled = (findNextIndex(idx, -1) === -1);
       nextBtn.disabled = (findNextIndex(idx, +1) === -1);
 
-      // Show submit only when at end OR all answered
       const allDone = (visibleCount > 0 && answeredCount === visibleCount);
       submitBtn.classList.toggle("hidden", !allDone);
-
-      // If there are no questions, submit hidden
       if (visibleCount === 0) submitBtn.classList.add("hidden");
     }
 
@@ -627,6 +636,16 @@
       if (status === "yes") btnYes.classList.add("active");
       if (status === "no") btnNo.classList.add("active");
       if (status === "na") btnNA.classList.add("active");
+    }
+
+    function renderPhotoPreview(photos){
+      photoPreview.innerHTML = "";
+      (photos || []).forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "photo-thumb";
+        photoPreview.appendChild(img);
+      });
     }
 
     function renderQuestion(){
@@ -644,7 +663,6 @@
         return;
       }
 
-      // If current question is hidden, jump forward (or backward)
       if (isHiddenByLogic(q)) {
         const next = findNextIndex(idx, +1);
         const prev = findNextIndex(idx, -1);
@@ -659,7 +677,6 @@
       shortIssueEl.textContent = q2.shortIssue || "Question";
       fullIssueEl.textContent = q2.fullIssue || "";
 
-      // visible index pill (count visible position)
       const visibleQs = questions.filter(x => x && !isHiddenByLogic(x));
       const visiblePos = visibleQs.findIndex(x => x.id === q2.id) + 1;
       idxPill.textContent = `${visiblePos} / ${visibleQs.length}`;
@@ -669,7 +686,6 @@
       commentInput.value = a.comments || "";
       renderPhotoPreview(a.photos || []);
 
-      // hint about logic group
       if (q2.followupGroup) {
         skipHint.textContent = `Logic group: ${q2.followupGroup} (${hiddenGroups.has(q2.followupGroup) ? "hidden" : "visible"})`;
       } else {
@@ -680,44 +696,44 @@
       saveState();
     }
 
-    function renderPhotoPreview(photos){
-      photoPreview.innerHTML = "";
-      (photos || []).forEach(src => {
-        const img = document.createElement("img");
-        img.src = src;
-        img.className = "photo-thumb";
-        photoPreview.appendChild(img);
-      });
+   function applyRulesForAnswer(questionId, status){
+  const s = normalizeSheetStatus(status);
+
+  LOGIC_RULES.forEach(rule => {
+    if (rule.triggerId !== questionId) return;
+    if (rule.triggerStatus !== s) return;
+
+    if (rule.action === "HIDE") {
+      hiddenGroups.add(rule.affectedGroup);
+
+      // ✅ NEW: wipe answers for that group so nothing stale can submit
+      clearAnswersForGroup(rule.affectedGroup);
     }
 
-    function applyRulesForAnswer(questionId, status){
-      // Run through all rules matching this trigger
-      LOGIC_RULES.forEach(rule => {
-        if (rule.triggerId !== questionId) return;
-        if (rule.triggerStatus !== status) return;
-
-        if (rule.action === "HIDE") hiddenGroups.add(rule.affectedGroup);
-        if (rule.action === "SHOW") hiddenGroups.delete(rule.affectedGroup);
-      });
+    if (rule.action === "SHOW") {
+      hiddenGroups.delete(rule.affectedGroup);
+      // (We do NOT restore old answers on SHOW — keeps it clean/intentional)
     }
+  });
+}
+
 
     function setAnswerStatus(status){
       const q = currentQuestion();
       if (!q) return;
 
-      const normalized = normalizeStatus(status);
+      const normalized = normalizeSheetStatus(status);
 
       const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
       answers.set(q.id, { ...existing, status: normalized });
 
       setStatusButtons(normalized);
 
-      // Apply logic rules
+      // Apply logic rules (Yes/No/NA)
       applyRulesForAnswer(q.id, normalized);
 
-      // If after applying rules the next questions in group are hidden, we can auto-advance
-      updateFooter();
-      saveState();
+      // ✅ Auto-advance to next visible question
+      advanceAfterAnswer();
     }
 
     /********************
@@ -761,7 +777,6 @@
         reader.readAsDataURL(file);
       });
 
-      // allow re-upload same file later
       photoInput.value = "";
     });
 
@@ -803,9 +818,8 @@
 
       rebuildQuestionsForArea();
 
-      // Move idx to first visible question
       idx = 0;
-      const firstVisible = isHiddenByLogic(questions[0]) ? findNextIndex(-1, +1) : 0;
+      const firstVisible = (questions[0] && isHiddenByLogic(questions[0])) ? findNextIndex(-1, +1) : 0;
       idx = firstVisible === -1 ? 0 : firstVisible;
 
       setStage("wizard");
@@ -823,7 +837,6 @@
         return;
       }
 
-      // Only send visible questions that have a status
       const items = questions
         .filter(q => q && !isHiddenByLogic(q))
         .map(q => {
@@ -838,7 +851,7 @@
             comments: a.comments || ""
           };
         })
-        .filter(x => x.status); // only answered items
+        .filter(x => x.status);
 
       if (!items.length) {
         alert("No answered items to submit yet.");
@@ -871,16 +884,14 @@
 
         alert("Submitted! Starting a new blank inspection.");
 
-        // Clear everything for a fresh run
         localStorage.removeItem(STORAGE_KEY);
         answers = new Map();
         hiddenGroups = new Set();
         idx = 0;
 
-        // Keep areas loaded, go back to setup, clear inspector fields
         inspectorNameInput.value = "";
         inspectorEmailInput.value = "";
-        areaSelect.value = ""; // force re-select
+        areaSelect.value = "";
         setupHint.textContent = "Submission saved successfully.";
 
         setStage("setup");
@@ -900,7 +911,6 @@
      * INIT
      ********************/
     async function init(){
-      // Load config from Sheets
       const [areaRows, qRows, logicRows] = await Promise.all([
         apiGet("areas"),
         apiGet("questions"),
@@ -914,24 +924,19 @@
       QUESTION_BANK = qRows.map(normalizeQuestionRow);
       LOGIC_RULES = logicRows.map(normalizeLogicRow);
 
-      // Populate area dropdown
       areaSelect.innerHTML = `<option value="">Select area…</option>` + AREAS.map(a =>
         `<option value="${a.id}">${a.name}</option>`
       ).join("");
 
-      // Try restore state
       const restored = loadState();
       if (restored) {
-        // restore setup inputs
         inspectorNameInput.value = session.inspectorName || "";
         inspectorEmailInput.value = session.inspectorEmail || "";
 
-        // set area
         if (session.areaId) {
           areaSelect.value = session.areaId;
           rebuildQuestionsForArea();
 
-          // go to wizard
           setStage("wizard");
           renderQuestion();
           return;
