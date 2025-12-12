@@ -581,7 +581,7 @@ async function submitInspection() {
   try {
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
-      body: JSON.stringify(payload)   // no custom headers → avoids CORS preflight issues
+      body: JSON.stringify(payload)   // no custom headers → avoids CORS drama
     });
 
     const text = await res.text();
@@ -595,23 +595,29 @@ async function submitInspection() {
     }
 
     if (!res.ok || !data || data.result !== "success") {
-      throw new Error("Apps Script error: " + (data && data.message ? data.message : "Unknown"));
+      throw new Error(
+        "Apps Script error: " +
+        (data && data.message ? data.message : "Unknown") +
+        " (status " + res.status + ")"
+      );
     }
 
     console.log("Rows appended:", data.rowsAppended);
 
-    // ✅ ONLY NOW reset everything
     alert("Inspection submitted! Starting a new blank inspection...");
 
+    // Reset issues
     issues.forEach(i => {
       i.status = null;
       i.photos = [];
       i.comments = "";
     });
 
+    // Reset inspector fields
     inspectorNameInput.value = "";
     inspectorEmailInput.value = "";
 
+    // Persist reset + refresh UI
     saveIssues();
     currentFilter = "All";
     renderFilters();
