@@ -405,13 +405,31 @@ function statusToClass(s) {
   return "";
 }
 
-async function apiGet(action) {
-  const res = await fetch(`${SCRIPT_URL}?action=${encodeURIComponent(action)}`);
-  const data = await res.json();
-  if (!data || data.result !== "success") {
-    throw new Error(`API ${action} failed`);
-  }
-  return data.rows || [];
+function apiGet(action) {
+  return new Promise((resolve, reject) => {
+    const cb = "cb_" + action + "_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+
+    window[cb] = (data) => {
+      try {
+        delete window[cb];
+        script.remove();
+        if (!data || data.result !== "success") return reject(new Error(`API ${action} failed`));
+        resolve(data.rows || []);
+      } catch (err) {
+        reject(err);
+      }
+    };
+
+    script.onerror = () => {
+      delete window[cb];
+      script.remove();
+      reject(new Error(`Failed to load API ${action}`));
+    };
+
+    script.src = `${SCRIPT_URL}?action=${encodeURIComponent(action)}&callback=${encodeURIComponent(cb)}`;
+    document.body.appendChild(script);
+  });
 }
 
 /**
