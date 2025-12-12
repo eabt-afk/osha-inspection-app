@@ -15,207 +15,138 @@
     }
 
     .app-shell {
-      max-width: 650px;
+      max-width: 720px;
       margin: 0 auto;
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
       overflow: hidden;
+      min-height: 92vh;
       display: flex;
       flex-direction: column;
-      height: 92vh;
     }
 
     header {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    header h1 { font-size: 1rem; font-weight: 650; }
+    header small { font-size: 0.75rem; color: #666; display:block; margin-top: 0.15rem; }
+
+    .setup {
       padding: 0.75rem 1rem;
       border-bottom: 1px solid #eee;
-    }
-
-    header h1 { font-size: 1rem; font-weight: 600; }
-    header small { font-size: 0.75rem; color: #666; }
-
-    .filters {
+      background: #fafafa;
       display: flex;
-      overflow-x: auto;
-      padding: 0.5rem 1rem;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .row {
+      display: flex;
       gap: 0.5rem;
-      border-bottom: 1px solid #eee;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
-    .filter-chip {
-      flex-shrink: 0;
-      border-radius: 999px;
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      border: 1px solid #ddd;
-      background: #fafafa;
-      cursor: pointer;
-      white-space: nowrap;
+    input, select, textarea {
+      font: inherit;
     }
 
-    .filter-chip.active {
-      background: #0070f3;
-      color: #fff;
-      border-color: #0070f3;
-    }
-
-    .list {
+    .setup input, .setup select {
       flex: 1;
-      overflow-y: auto;
-      padding: 0.5rem 1rem;
-    }
-
-    .category-group { margin-bottom: 0.75rem; }
-
-    .category-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #666;
-      margin-bottom: 0.25rem;
-      text-transform: uppercase;
-    }
-
-    .issue-row {
-      background: #fafafa;
+      min-width: 180px;
+      font-size: 0.85rem;
+      padding: 0.45rem 0.55rem;
       border-radius: 8px;
-      padding: 0.5rem;
-      margin-bottom: 0.4rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      gap: 0.5rem;
-    }
-
-    .issue-text { font-size: 0.85rem; flex: 1; }
-    .issue-status-icon { font-size: 1.1rem; width: 2rem; text-align: right; }
-
-    .status-compliant { color: #16a34a; }
-    .status-needs_attention { color: #dc2626; }
-    .status-na { color: #6b7280; }
-
-    /* Inspector bar at bottom */
-    .inspector-bar {
-      border-top: 1px solid #eee;
-      padding: 0.6rem 1rem;
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      flex-wrap: wrap;
-      background: #fafafa;
-    }
-
-    .inspector-fields {
-      flex: 1;
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .inspector-fields input,
-    .inspector-fields select {
-      flex: 1;
-      min-width: 120px;
-      font-size: 0.8rem;
-      padding: 0.35rem 0.45rem;
-      border-radius: 6px;
       border: 1px solid #ddd;
       background: #fff;
     }
 
-    .inspector-fields select {
-      min-width: 160px;
-    }
-
-    #submitBtn {
-      font-size: 0.8rem;
-      padding: 0.35rem 0.9rem;
-      border-radius: 999px;
+    .btn {
       border: none;
-      background: #22c55e;
-      color: #fff;
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.85rem;
       cursor: pointer;
       white-space: nowrap;
     }
 
-    #submitBtn:disabled {
-      opacity: 0.7;
-      cursor: default;
-    }
+    .btn-primary { background: #0070f3; color: #fff; }
+    .btn-secondary { background: #e5e7eb; color: #111827; }
+    .btn-success { background: #22c55e; color: #fff; }
+    .btn:disabled { opacity: 0.65; cursor: default; }
 
-    /* Detail modal */
-    .detail-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 10;
-    }
-
-    .detail-backdrop.open { display: flex; }
-
-    .detail-panel {
-      background: #fff;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 16px 16px 0 0;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
-      padding: 1rem;
-      max-height: 80vh;
+    .content {
+      flex: 1;
+      padding: 0.85rem 1rem 1rem;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      overflow-y: auto;
     }
 
-    .detail-header {
+    .hidden { display: none !important; }
+
+    .progress {
       display: flex;
       justify-content: space-between;
-      gap: 0.5rem;
-      align-items: flex-start;
+      gap: 0.75rem;
+      align-items: baseline;
+      color: #666;
+      font-size: 0.82rem;
     }
 
-    .detail-title { font-size: 0.95rem; font-weight: 600; }
+    .card {
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 0.85rem;
+      background: #fff;
+    }
+
     .badge {
-      font-size: 0.7rem;
-      padding: 0.15rem 0.5rem;
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.18rem 0.55rem;
       border-radius: 999px;
       background: #eef2ff;
       color: #3730a3;
+      margin-bottom: 0.45rem;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .detail-full-issue {
-      font-size: 0.85rem;
-      background: #f9fafb;
-      padding: 0.5rem;
-      border-radius: 8px;
-      line-height: 1.35;
+    .q-title {
+      font-size: 0.98rem;
+      font-weight: 650;
+      margin-bottom: 0.5rem;
+      line-height: 1.25;
     }
 
-    .status-label,
-    .photo-label,
-    .comment-label {
-      font-size: 0.8rem;
-      font-weight: 600;
+    .q-full {
+      font-size: 0.9rem;
+      line-height: 1.35;
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 0.65rem 0.7rem;
+      border: 1px solid #eee;
     }
 
     .status-buttons {
       display: flex;
-      gap: 0.4rem;
-      margin-top: 0.25rem;
+      gap: 0.45rem;
       flex-wrap: wrap;
+      margin-top: 0.65rem;
     }
 
     .status-btn {
       flex: 1;
-      min-width: 115px;
+      min-width: 120px;
       border-radius: 999px;
-      padding: 0.35rem;
-      font-size: 0.8rem;
+      padding: 0.45rem;
+      font-size: 0.85rem;
       border: 1px solid #ddd;
       background: #fff;
       cursor: pointer;
@@ -225,186 +156,208 @@
       border-color: #0070f3;
       background: #e0f2fe;
       color: #0369a1;
+      font-weight: 650;
     }
 
-    .photo-group input[type="file"] {
-      margin-top: 0.25rem;
-      font-size: 0.8rem;
-    }
-
-    .photo-preview-container {
-      margin-top: 0.3rem;
+    .extras {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-top: 0.7rem;
     }
 
-    .photo-thumb {
-      width: 70px;
-      height: 70px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #ddd;
+    .extras label {
+      font-size: 0.82rem;
+      font-weight: 650;
     }
 
-    textarea#commentInput {
+    textarea {
       width: 100%;
-      min-height: 60px;
-      font-size: 0.8rem;
-      padding: 0.4rem;
-      border-radius: 6px;
+      min-height: 70px;
+      font-size: 0.85rem;
+      padding: 0.55rem;
+      border-radius: 10px;
       border: 1px solid #ddd;
       resize: vertical;
     }
 
-    .detail-actions {
+    .photo-preview {
       display: flex;
-      justify-content: flex-end;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-top: 0.35rem;
+    }
+
+    .photo-preview img {
+      width: 74px;
+      height: 74px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
       gap: 0.5rem;
+      margin-top: 0.85rem;
     }
 
-    .btn {
-      padding: 0.35rem 0.9rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      cursor: pointer;
+    .footer {
+      border-top: 1px solid #eee;
+      background: #fafafa;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
-    .btn-secondary { background: #e5e7eb; border: none; }
-    .btn-primary { background: #0070f3; color: #fff; border: none; }
+    .footer small { color: #666; font-size: 0.8rem; }
+
+    @media (max-width: 420px) {
+      body { padding: 0.5rem; }
+      .setup input, .setup select { min-width: 140px; }
+      .status-btn { min-width: 100px; }
+      .q-title { font-size: 0.95rem; }
+    }
   </style>
 </head>
 
 <body>
 <div class="app-shell">
-
   <header>
     <h1>OSHA Self-Inspection</h1>
-    <small>Tap an item to update status, add photos & notes</small>
+    <small>Select an area, then answer questions one at a time. “Observed?” questions can skip entire sections.</small>
   </header>
 
-  <div class="filters" id="filters"></div>
-
-  <div class="list" id="issueList"></div>
-
-  <!-- Inspector info + submit at bottom -->
-  <div class="inspector-bar">
-    <div class="inspector-fields">
-      <input id="inspectorName" type="text" placeholder="Inspector name" />
-      <input id="inspectorEmail" type="email" placeholder="Email" />
+  <!-- SETUP (area required before loading questions) -->
+  <div class="setup" id="setup">
+    <div class="row">
+      <input id="inspectorName" type="text" placeholder="Inspector name (required)" />
+      <input id="inspectorEmail" type="email" placeholder="Email (required)" />
+    </div>
+    <div class="row">
       <select id="areaSelect" aria-label="Area">
         <option value="">Loading areas…</option>
       </select>
+      <button class="btn btn-primary" id="startBtn" disabled>Start inspection</button>
     </div>
-    <button id="submitBtn">Submit</button>
+    <small id="setupHint">Choose an area to load the right checklist.</small>
   </div>
 
-</div>
-
-<!-- Detail modal -->
-<div class="detail-backdrop" id="detailBackdrop">
-  <div class="detail-panel">
-
-    <div class="detail-header">
-      <div class="detail-title" id="detailShortIssue"></div>
-      <span class="badge" id="detailCategory"></span>
+  <!-- QUESTION VIEW -->
+  <div class="content hidden" id="wizard">
+    <div class="progress">
+      <div><span id="progressText">Question 0 of 0</span></div>
+      <div><span id="progressCat"></span></div>
     </div>
 
-    <div class="detail-full-issue" id="detailFullIssue"></div>
+    <div class="card">
+      <div class="badge" id="qCategory">Category</div>
+      <div class="q-title" id="qShort">Short issue</div>
+      <div class="q-full" id="qFull">Full question text…</div>
 
-    <div>
-      <div class="status-label">Status</div>
       <div class="status-buttons">
-        <button class="status-btn" data-status="compliant" id="btnCompliant">✔ Compliant</button>
-        <button class="status-btn" data-status="needs_attention" id="btnNeedsAttention">❌ Needs Attention</button>
-        <button class="status-btn" data-status="na" id="btnNA">➖ N/A</button>
+        <button class="status-btn" id="btnYes">✔ Yes</button>
+        <button class="status-btn" id="btnNo">❌ No</button>
+        <button class="status-btn" id="btnNA">➖ N/A</button>
+      </div>
+
+      <div class="extras">
+        <div>
+          <label for="commentInput">Comments / Notes (optional)</label>
+          <textarea id="commentInput" placeholder="Add context, location, follow-up needed, etc."></textarea>
+        </div>
+
+        <div>
+          <label for="photoInput">Photos (optional)</label>
+          <input type="file" id="photoInput" accept="image/*" multiple />
+          <div class="photo-preview" id="photoPreview"></div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="btn btn-secondary" id="prevBtn">Back</button>
+        <button class="btn btn-primary" id="nextBtn">Next</button>
       </div>
     </div>
+  </div>
 
-    <div class="photo-group">
-      <div class="photo-label">Photos (optional)</div>
-      <input type="file" id="photoInput" accept="image/*" multiple />
-      <div id="photoPreviewContainer" class="photo-preview-container"></div>
-    </div>
-
-    <div class="comment-group">
-      <div class="comment-label">Comments / Notes (optional)</div>
-      <textarea id="commentInput" placeholder="Add any additional context, observations, or follow-up needed..."></textarea>
-    </div>
-
-    <div class="detail-actions">
-      <button class="btn btn-secondary" id="btnCancel">Cancel</button>
-      <button class="btn btn-primary" id="btnSave">Save</button>
-    </div>
-
+  <!-- FOOTER SUBMIT -->
+  <div class="footer">
+    <small id="footerStatus">Not started</small>
+    <button class="btn btn-success" id="submitBtn" disabled>Submit</button>
   </div>
 </div>
 
 <script>
 /**
  * CONFIG
+ * - SCRIPT_URL is your deployed Apps Script web app URL (ends in /exec)
  */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznXNi6HRD8qpn3whwdxsj9X0dq7xdii-Gn7pPqzsNvnGoJQ1G5ephp1yhUlnqd-qW1/exec";
-const STORAGE_KEY = "osha_inspection_app_v3_sheet_driven";
+const STORAGE_KEY = "osha_wizard_v1";
+
+/**
+ * OBSERVED QUESTIONS (by ID) — you provided these
+ * When user answers NO to an observed question, we skip all upcoming questions with the same Followup_Group.
+ */
+const OBSERVED_IDS = new Set([7, 13, 23, 28, 35, 48]);
 
 /**
  * DOM
  */
-const filtersContainer = document.getElementById("filters");
-const issueListEl = document.getElementById("issueList");
-
-const detailBackdrop = document.getElementById("detailBackdrop");
-const detailShortIssue = document.getElementById("detailShortIssue");
-const detailCategory = document.getElementById("detailCategory");
-const detailFullIssue = document.getElementById("detailFullIssue");
-
-const btnCompliant = document.getElementById("btnCompliant");
-const btnNeedsAttention = document.getElementById("btnNeedsAttention");
-const btnNA = document.getElementById("btnNA");
-
-const photoInput = document.getElementById("photoInput");
-const photoPreviewContainer = document.getElementById("photoPreviewContainer");
-const commentInput = document.getElementById("commentInput");
-const btnCancel = document.getElementById("btnCancel");
-const btnSave = document.getElementById("btnSave");
+const setupEl = document.getElementById("setup");
+const wizardEl = document.getElementById("wizard");
+const startBtn = document.getElementById("startBtn");
+const submitBtn = document.getElementById("submitBtn");
 
 const inspectorNameInput = document.getElementById("inspectorName");
 const inspectorEmailInput = document.getElementById("inspectorEmail");
 const areaSelect = document.getElementById("areaSelect");
-const submitBtn = document.getElementById("submitBtn");
+const setupHint = document.getElementById("setupHint");
+const footerStatus = document.getElementById("footerStatus");
+
+const progressText = document.getElementById("progressText");
+const progressCat = document.getElementById("progressCat");
+
+const qCategory = document.getElementById("qCategory");
+const qShort = document.getElementById("qShort");
+const qFull = document.getElementById("qFull");
+
+const btnYes = document.getElementById("btnYes");
+const btnNo  = document.getElementById("btnNo");
+const btnNA  = document.getElementById("btnNA");
+
+const commentInput = document.getElementById("commentInput");
+const photoInput = document.getElementById("photoInput");
+const photoPreview = document.getElementById("photoPreview");
+
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
 /**
  * STATE
  */
-let QUESTION_BANK = [];
 let AREAS = [];
-let issues = [];
-let currentFilter = "All";
-let currentIssueId = null;
+let QUESTION_BANK = [];    // normalized questions
+let FLOW = [];             // area-filtered, active, sorted questions used in this run
+let idx = 0;               // current index in FLOW
 
-let tempStatus = null;
-let tempPhotos = [];
-let tempComments = "";
+// answers keyed by question id
+let answers = new Map();   // id -> {status:'yes'|'no'|'na', comments:'', photos:[base64...]}
 
-/**
- * HELPERS
- */
+// set of followup groups to skip (when observed==no)
+let skipGroups = new Set();
+
 function safeTrim(v) { return String(v ?? "").trim(); }
 function isTrue(v) { return String(v ?? "").toUpperCase() === "TRUE"; }
 
-function statusToSymbol(s) {
-  if (s === "compliant") return "✔";
-  if (s === "needs_attention") return "✖";
-  if (s === "na") return "➖";
-  return "•";
-}
-function statusToClass(s) {
-  if (s === "compliant") return "status-compliant";
-  if (s === "needs_attention") return "status-needs_attention";
-  if (s === "na") return "status-na";
-  return "";
-}
-
+/**
+ * JSONP GET (GitHub Pages safe)
+ */
 function apiGet(action) {
   return new Promise((resolve, reject) => {
     const cb = "cb_" + action + "_" + Math.random().toString(36).slice(2);
@@ -433,256 +386,316 @@ function apiGet(action) {
 }
 
 /**
- * SHEET-DRIVEN LOADING
+ * Normalize rows from Question_Bank
+ * Expected headers include:
+ * ID, Category, ShortIssue, FullIssue, Area_Tags, Active, Requires_Photo, Requires_Comment, Followup_Group, Order
  */
 function normalizeQuestionRow(row) {
-  // Expecting headers from Question_Bank:
-  // ID, Category, ShortIssue, FullIssue, Area_Tags, Active, Requires_Photo, Requires_Comment, Followup_Group, Order
-  const id = safeTrim(row.ID);
+  const id = Number(safeTrim(row.ID));
   return {
-    id: Number(id),
+    id,
     category: safeTrim(row.Category),
     shortIssue: safeTrim(row.ShortIssue),
     fullIssue: safeTrim(row.FullIssue),
+    areaTags: safeTrim(row.Area_Tags || "ALL"),
     active: isTrue(row.Active),
-    order: Number(row.Order || 9999),
-    // we store these for future enhancements; not enforced yet
     requiresPhoto: isTrue(row.Requires_Photo),
     requiresComment: isTrue(row.Requires_Comment),
-    areaTags: safeTrim(row.Area_Tags || "ALL"),
-    followupGroup: safeTrim(row.Followup_Group || "")
+    followupGroup: safeTrim(row.Followup_Group || ""),
+    order: Number(row.Order || 9999),
   };
 }
 
-function loadSavedMap() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return new Map();
+function areaAllows(q, areaId) {
+  const tags = safeTrim(q.areaTags || "ALL").split(",").map(t => t.trim()).filter(Boolean);
+  return tags.includes("ALL") || tags.includes(areaId);
+}
+
+/**
+ * Persistence (so if someone refreshes mid-inspection, they can recover)
+ */
+function saveState() {
+  const obj = {
+    idx,
+    skipGroups: Array.from(skipGroups),
+    answers: Array.from(answers.entries()),
+    areaId: areaSelect.value || ""
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+}
+
+function clearState() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+function loadStateMaybe() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return false;
   try {
-    const parsed = JSON.parse(saved);
-    return new Map(parsed.map(x => [Number(x.id), x]));
-  } catch {
-    return new Map();
-  }
-}
-
-function saveIssues() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
-}
-
-function applyAreaFilterToQuestions(qs, selectedArea) {
-  // For now we keep it simple: show ALL, or show those tagged with selected area (if you start using tags)
-  // If Area_Tags is blank, treat as ALL.
-  const areaId = safeTrim(selectedArea || "ALL");
-  return qs.filter(q => {
-    const tags = safeTrim(q.areaTags || "ALL").split(",").map(t => t.trim());
-    return tags.includes("ALL") || tags.includes(areaId);
-  });
-}
-
-function rebuildIssuesFromSheet() {
-  const savedMap = loadSavedMap();
-  const selectedArea = areaSelect.value || "ALL";
-
-  const activeQs = applyAreaFilterToQuestions(
-    QUESTION_BANK.filter(q => q.active),
-    selectedArea
-  ).sort((a,b) => a.order - b.order);
-
-  issues = activeQs.map(q => {
-    const prior = savedMap.get(q.id);
-    return {
-      id: q.id,
-      category: q.category,
-      shortIssue: q.shortIssue,
-      fullIssue: q.fullIssue,
-      status: prior?.status ?? null,
-      photos: Array.isArray(prior?.photos) ? prior.photos : [],
-      comments: prior?.comments ?? ""
-    };
-  });
-
-  saveIssues();
-  currentFilter = "All";
-  renderFilters();
-  renderIssueList();
-}
-
-async function loadConfig() {
-  // Areas
-  AREAS = await apiGet("areas");
-  const activeAreas = AREAS
-    .filter(a => String(a.Active ?? a.active ?? "").toUpperCase() === "TRUE")
-    .sort((a,b) => Number(a.Order || 9999) - Number(b.Order || 9999));
-
-  areaSelect.innerHTML = activeAreas.map(a => {
-    const id = safeTrim(a.Area_ID || a.area_id || "");
-    const name = safeTrim(a.Area_Name || a.area_name || id);
-    return `<option value="${id}">${name}</option>`;
-  }).join("");
-
-  // Default to ALL if present
-  const hasAll = activeAreas.some(a => safeTrim(a.Area_ID || "") === "ALL");
-  areaSelect.value = hasAll ? "ALL" : (activeAreas[0] ? safeTrim(activeAreas[0].Area_ID) : "ALL");
-
-  areaSelect.addEventListener("change", () => {
-    // On area change we rebuild (keeps saved statuses where IDs overlap)
-    rebuildIssuesFromSheet();
-  });
-
-  // Questions
-  const qbRows = await apiGet("questions");
-  QUESTION_BANK = qbRows.map(normalizeQuestionRow);
-
-  rebuildIssuesFromSheet();
+    const parsed = JSON.parse(raw);
+    if (parsed && Array.isArray(parsed.answers)) {
+      idx = Number(parsed.idx || 0);
+      skipGroups = new Set(parsed.skipGroups || []);
+      answers = new Map(parsed.answers || []);
+      if (parsed.areaId) areaSelect.value = parsed.areaId;
+      return true;
+    }
+  } catch {}
+  return false;
 }
 
 /**
- * FILTER CHIPS
+ * UI helpers
  */
-function getCategories() {
-  return ["All", ...new Set(issues.map(i => i.category))];
-}
-function renderFilters() {
-  filtersContainer.innerHTML = "";
-  getCategories().forEach(cat => {
-    const chip = document.createElement("button");
-    chip.className = "filter-chip" + (cat === currentFilter ? " active" : "");
-    chip.textContent = cat;
-    chip.onclick = () => { currentFilter = cat; renderFilters(); renderIssueList(); };
-    filtersContainer.appendChild(chip);
-  });
+function setStatusButtons(status) {
+  [btnYes, btnNo, btnNA].forEach(b => b.classList.remove("active"));
+  if (status === "yes") btnYes.classList.add("active");
+  if (status === "no")  btnNo.classList.add("active");
+  if (status === "na")  btnNA.classList.add("active");
 }
 
-/**
- * LIST RENDERING
- */
-function renderIssueList() {
-  issueListEl.innerHTML = "";
-  const filtered = currentFilter === "All"
-    ? issues
-    : issues.filter(i => i.category === currentFilter);
-
-  const grouped = {};
-  filtered.forEach(i => { (grouped[i.category] ||= []).push(i); });
-
-  Object.keys(grouped).forEach(cat => {
-    const group = document.createElement("div");
-    group.className = "category-group";
-
-    const title = document.createElement("div");
-    title.className = "category-title";
-    title.textContent = cat;
-    group.appendChild(title);
-
-    grouped[cat].forEach(issue => {
-      const row = document.createElement("div");
-      row.className = "issue-row";
-      row.onclick = () => openDetail(issue.id);
-      row.innerHTML = `
-        <div class="issue-text">${issue.shortIssue}</div>
-        <div class="issue-status-icon ${statusToClass(issue.status)}">
-          ${statusToSymbol(issue.status)}
-        </div>
-      `;
-      group.appendChild(row);
-    });
-
-    issueListEl.appendChild(group);
-  });
-}
-
-/**
- * DETAIL MODAL
- */
-function setStatusButtons(s) {
-  [btnCompliant, btnNeedsAttention, btnNA].forEach(b => b.classList.remove("active"));
-  if (s === "compliant") btnCompliant.classList.add("active");
-  if (s === "needs_attention") btnNeedsAttention.classList.add("active");
-  if (s === "na") btnNA.classList.add("active");
-}
-function renderPhotoPreviews() {
-  photoPreviewContainer.innerHTML = "";
-  tempPhotos.forEach(src => {
+function setPhotosPreview(photos) {
+  photoPreview.innerHTML = "";
+  (photos || []).forEach(src => {
     const img = document.createElement("img");
     img.src = src;
-    img.className = "photo-thumb";
-    photoPreviewContainer.appendChild(img);
+    photoPreview.appendChild(img);
   });
 }
 
-function openDetail(id) {
-  currentIssueId = id;
-  const issue = issues.find(i => i.id === id);
-  if (!issue) return;
+function currentQuestion() {
+  return FLOW[idx] || null;
+}
 
-  detailShortIssue.textContent = issue.shortIssue;
-  detailCategory.textContent = issue.category;
-  detailFullIssue.textContent = issue.fullIssue;
+function updateFooter() {
+  const answeredCount = Array.from(answers.values()).filter(a => a && a.status).length;
+  footerStatus.textContent = `Answered ${answeredCount} / ${FLOW.length}`;
+  submitBtn.disabled = (answeredCount === 0);
+}
 
-  tempStatus = issue.status;
-  tempPhotos = Array.isArray(issue.photos) ? [...issue.photos] : [];
-  tempComments = issue.comments || "";
+/**
+ * Navigation with skipping
+ */
+function isSkippedQuestion(q) {
+  if (!q) return true;
+  if (!q.followupGroup) return false;
+  return skipGroups.has(q.followupGroup);
+}
 
-  commentInput.value = tempComments;
-  setStatusButtons(tempStatus);
-  renderPhotoPreviews();
+function jumpToNextValid(fromIndex) {
+  let j = fromIndex;
+  while (j < FLOW.length && isSkippedQuestion(FLOW[j])) j++;
+  return j;
+}
 
+function jumpToPrevValid(fromIndex) {
+  let j = fromIndex;
+  while (j >= 0 && isSkippedQuestion(FLOW[j])) j--;
+  return j;
+}
+
+/**
+ * Render current question
+ */
+function render() {
+  const q = currentQuestion();
+  if (!q) {
+    // finished
+    wizardEl.classList.add("hidden");
+    footerStatus.textContent = `Ready to submit — ${Array.from(answers.values()).filter(a => a.status).length} answered`;
+    submitBtn.disabled = false;
+    return;
+  }
+
+  // Progress
+  progressText.textContent = `Question ${idx + 1} of ${FLOW.length}`;
+  progressCat.textContent = q.category || "";
+
+  // Question text
+  qCategory.textContent = q.category || "";
+  qShort.textContent = q.shortIssue || "";
+  qFull.textContent = q.fullIssue || "";
+
+  // Load existing answer if any
+  const a = answers.get(q.id) || { status: null, comments: "", photos: [] };
+  setStatusButtons(a.status);
+  commentInput.value = a.comments || "";
+  setPhotosPreview(a.photos || []);
   photoInput.value = "";
-  detailBackdrop.classList.add("open");
+
+  // Buttons
+  prevBtn.disabled = (jumpToPrevValid(idx - 1) < 0);
+  nextBtn.textContent = (idx >= FLOW.length - 1) ? "Finish" : "Next";
+
+  updateFooter();
+  saveState();
 }
-function closeDetail() {
-  detailBackdrop.classList.remove("open");
-  currentIssueId = null;
+
+function setStatus(status) {
+  const q = currentQuestion();
+  if (!q) return;
+
+  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+  answers.set(q.id, { ...existing, status });
+  setStatusButtons(status);
+
+  // OBSERVED? logic:
+  // If this is an observed question and user answers NO,
+  // then skip all questions sharing its followupGroup.
+  if (OBSERVED_IDS.has(q.id) && status === "no" && q.followupGroup) {
+    skipGroups.add(q.followupGroup);
+  }
+
+  // If they change observed from NO -> YES/NA, remove the skip
+  if (OBSERVED_IDS.has(q.id) && status !== "no" && q.followupGroup) {
+    skipGroups.delete(q.followupGroup);
+  }
+
+  updateFooter();
+  saveState();
 }
 
-btnCancel.onclick = closeDetail;
+/**
+ * Wire status buttons
+ */
+btnYes.onclick = () => setStatus("yes");
+btnNo.onclick  = () => setStatus("no");
+btnNA.onclick  = () => setStatus("na");
 
-btnCompliant.onclick = () => { tempStatus = "compliant"; setStatusButtons(tempStatus); };
-btnNeedsAttention.onclick = () => { tempStatus = "needs_attention"; setStatusButtons(tempStatus); };
-btnNA.onclick = () => { tempStatus = "na"; setStatusButtons(tempStatus); };
+/**
+ * Comments/photos inputs
+ */
+commentInput.oninput = (e) => {
+  const q = currentQuestion(); if (!q) return;
+  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+  answers.set(q.id, { ...existing, comments: e.target.value });
+  saveState();
+};
 
-photoInput.onchange = e => {
+photoInput.onchange = (e) => {
+  const q = currentQuestion(); if (!q) return;
   const files = Array.from(e.target.files || []);
   if (!files.length) return;
 
+  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+  const photos = Array.isArray(existing.photos) ? [...existing.photos] : [];
+
+  let remaining = files.length;
   files.forEach(file => {
     const reader = new FileReader();
-    reader.onload = evt => {
-      tempPhotos.push(evt.target.result);
-      renderPhotoPreviews();
+    reader.onload = (evt) => {
+      photos.push(evt.target.result);
+      remaining--;
+      if (remaining === 0) {
+        answers.set(q.id, { ...existing, photos });
+        setPhotosPreview(photos);
+        saveState();
+      }
     };
     reader.readAsDataURL(file);
   });
 };
 
-commentInput.oninput = e => {
-  tempComments = e.target.value;
+/**
+ * Next/Back
+ * - If a question has no status, we still allow Next (you can enforce if you want)
+ * - Next jumps over skipped groups
+ */
+prevBtn.onclick = () => {
+  const j = jumpToPrevValid(idx - 1);
+  if (j >= 0) idx = j;
+  render();
 };
 
-btnSave.onclick = () => {
-  const idx = issues.findIndex(i => i.id === currentIssueId);
-  if (idx === -1) return;
-
-  issues[idx].status = tempStatus;
-  issues[idx].photos = tempPhotos;
-  issues[idx].comments = tempComments;
-
-  saveIssues();
-  renderIssueList();
-  closeDetail();
-};
-
-detailBackdrop.onclick = e => {
-  if (e.target === detailBackdrop) closeDetail();
+nextBtn.onclick = () => {
+  // advance to next valid
+  let j = jumpToNextValid(idx + 1);
+  if (j >= FLOW.length) {
+    // finished
+    idx = FLOW.length; // render() will show finish state
+    render();
+    return;
+  }
+  idx = j;
+  render();
 };
 
 /**
- * SUBMIT TO GOOGLE SHEET
+ * Load areas + questions, but only build FLOW after user chooses area and clicks Start
+ */
+async function init() {
+  // Load areas
+  AREAS = await apiGet("areas");
+  const activeAreas = AREAS
+    .filter(a => String(a.Active ?? a.active ?? "").toUpperCase() === "TRUE")
+    .sort((a,b) => Number(a.Order || 9999) - Number(b.Order || 9999));
+
+  areaSelect.innerHTML = `<option value="">Select area (required)</option>` + activeAreas.map(a => {
+    const id = safeTrim(a.Area_ID || a.area_id || "");
+    const name = safeTrim(a.Area_Name || a.area_name || id);
+    return `<option value="${id}">${name}</option>`;
+  }).join("");
+
+  // Load questions
+  const qbRows = await apiGet("questions");
+  QUESTION_BANK = qbRows.map(normalizeQuestionRow).filter(q => q.active);
+
+  // Enable start only when area selected
+  function validateStart() {
+    const okArea = !!safeTrim(areaSelect.value);
+    startBtn.disabled = !okArea;
+    setupHint.textContent = okArea ? "Ready. Click Start inspection." : "Choose an area to load the right checklist.";
+  }
+  areaSelect.onchange = validateStart;
+  validateStart();
+
+  // If user had state saved, allow restore
+  const restored = loadStateMaybe();
+  if (restored && safeTrim(areaSelect.value)) {
+    setupHint.textContent = "Found an in-progress inspection for this device. Click Start to resume.";
+    startBtn.disabled = false;
+  }
+}
+
+startBtn.onclick = () => {
+  const areaId = safeTrim(areaSelect.value);
+  if (!areaId) { alert("Please select an area."); return; }
+
+  // Build FLOW for this area
+  FLOW = QUESTION_BANK
+    .filter(q => areaAllows(q, areaId))
+    .sort((a,b) => a.order - b.order);
+
+  // If starting fresh (no saved state or mismatched area), reset
+  const savedRaw = localStorage.getItem(STORAGE_KEY);
+  if (!savedRaw) {
+    idx = 0;
+    skipGroups = new Set();
+    answers = new Map();
+  } else {
+    // ensure idx is within bounds for this FLOW
+    if (idx < 0 || idx >= FLOW.length) idx = 0;
+  }
+
+  // Ensure we start on first non-skipped
+  idx = jumpToNextValid(idx);
+  if (idx >= FLOW.length) idx = 0;
+
+  // Show wizard
+  setupEl.classList.add("hidden");
+  wizardEl.classList.remove("hidden");
+
+  footerStatus.textContent = "In progress…";
+  render();
+};
+
+/**
+ * Submit
  */
 async function submitInspection() {
   const name = inspectorNameInput.value.trim();
   const email = inspectorEmailInput.value.trim();
-  const areaId = (areaSelect.value || "").trim();
+  const areaId = safeTrim(areaSelect.value);
 
   if (!name || !email) {
     alert("Please enter your name and email before submitting.");
@@ -693,77 +706,65 @@ async function submitInspection() {
     return;
   }
 
-  const itemsToSend = issues.filter(i => i.status);
-  if (!itemsToSend.length) {
-    alert("No items have a status yet.");
+  const items = [];
+  for (const q of FLOW) {
+    const a = answers.get(q.id);
+    if (!a || !a.status) continue;
+
+    items.push({
+      id: q.id,
+      category: q.category,
+      shortIssue: q.shortIssue,
+      fullIssue: q.fullIssue,
+      status: a.status,            // yes | no | na
+      photos: a.photos || [],
+      comments: a.comments || ""
+    });
+  }
+
+  if (!items.length) {
+    alert("No answers yet.");
     return;
   }
 
-  // Send only fields the backend expects
-  const payload = {
-    inspectorName: name,
-    inspectorEmail: email,
-    areaId: areaId, // ✅ NEW
-    items: itemsToSend.map(i => ({
-      id: i.id,
-      category: i.category,
-      shortIssue: i.shortIssue,
-      fullIssue: i.fullIssue,
-      status: i.status,
-      photos: i.photos || [],
-      comments: i.comments || ""
-    }))
-  };
+  const payload = { inspectorName: name, inspectorEmail: email, areaId, items };
 
   submitBtn.disabled = true;
-  submitBtn.textContent = "Submitting...";
+  submitBtn.textContent = "Submitting…";
 
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-
+    const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
     const text = await res.text();
-    console.log("Script raw response:", text);
-
     let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      throw new Error("Could not parse Apps Script response as JSON");
-    }
+    try { data = JSON.parse(text); } catch { throw new Error("Could not parse Apps Script response"); }
 
     if (!res.ok || !data || data.result !== "success") {
-      throw new Error(
-        "Apps Script error: " +
-        (data && data.message ? data.message : "Unknown") +
-        " (status " + res.status + ")"
-      );
+      throw new Error(data && data.message ? data.message : "Apps Script error");
     }
 
-    alert("Inspection submitted! Starting a new blank inspection...");
+    alert("Submitted! Starting a new blank inspection.");
 
-    // Reset issues
-    issues.forEach(i => {
-      i.status = null;
-      i.photos = [];
-      i.comments = "";
-    });
+    // clear local state
+    clearState();
+    idx = 0;
+    skipGroups = new Set();
+    answers = new Map();
 
-    // Reset inspector fields (keep area selected by default; comment out if you want it cleared)
+    // reset UI back to setup (keep area selected so they can re-run quickly)
+    wizardEl.classList.add("hidden");
+    setupEl.classList.remove("hidden");
+
+    // optional: clear inspector info every time
     inspectorNameInput.value = "";
     inspectorEmailInput.value = "";
-    // areaSelect.value = "ALL";
 
-    saveIssues();
-    currentFilter = "All";
-    renderFilters();
-    renderIssueList();
+    footerStatus.textContent = "Not started";
+    submitBtn.textContent = "Submit";
+    submitBtn.disabled = true;
 
   } catch (err) {
-    console.error("Submission failed:", err);
-    alert("Error submitting inspection. See console for details.");
+    console.error(err);
+    alert("Submit failed — check console for details.");
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
@@ -772,11 +773,11 @@ async function submitInspection() {
 submitBtn.onclick = submitInspection;
 
 /**
- * INIT
+ * Boot
  */
-loadConfig().catch(err => {
+init().catch(err => {
   console.error(err);
-  alert("Failed to load checklist from Google Sheet. Check console for details.");
+  alert("Failed to load areas/questions. Check console for details.");
 });
 </script>
 </body>
