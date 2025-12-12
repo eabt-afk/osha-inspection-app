@@ -8,9 +8,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background: #f5f5f5;
-      color: #222;
+      color: #111827;
       padding: 0.75rem;
     }
 
@@ -18,767 +18,942 @@
       max-width: 720px;
       margin: 0 auto;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
       overflow: hidden;
-      min-height: 92vh;
       display: flex;
       flex-direction: column;
+      min-height: 92vh;
     }
 
     header {
       padding: 0.85rem 1rem;
       border-bottom: 1px solid #eee;
+      background: #fff;
     }
+    header h1 { font-size: 1.05rem; font-weight: 700; }
+    header small { display:block; margin-top: 0.2rem; font-size: 0.78rem; color: #6b7280; }
 
-    header h1 { font-size: 1rem; font-weight: 650; }
-    header small { font-size: 0.75rem; color: #666; display:block; margin-top: 0.15rem; }
+    .stage {
+      flex: 1;
+      padding: 1rem;
+      display: none;
+    }
+    .stage.active { display: block; }
 
-    .setup {
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid #eee;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
+    .card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
     }
 
     .row {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
-      align-items: center;
+      margin-top: 0. AttachShadow issue; 
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #374151;
+      display: block;
+      margin-bottom: 0.35rem;
     }
 
     input, select, textarea {
-      font: inherit;
-    }
-
-    .setup input, .setup select {
-      flex: 1;
-      min-width: 180px;
-      font-size: 0.85rem;
-      padding: 0.45rem 0.55rem;
-      border-radius: 8px;
+      width: 100%;
+      font-size: 0.9rem;
+      padding: 0.55rem 0.6rem;
+      border-radius: 10px;
       border: 1px solid #ddd;
       background: #fff;
+      outline: none;
+    }
+
+    textarea { min-height: 84px; resize: vertical; }
+
+    .field {
+      flex: 1;
+      min-width: 180px;
     }
 
     .btn {
+      appearance: none;
       border: none;
       border-radius: 999px;
-      padding: 0.45rem 0.85rem;
-      font-size: 0.85rem;
+      padding: 0.55rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
     }
 
-    .btn-primary { background: #0070f3; color: #fff; }
-    .btn-secondary { background: #e5e7eb; color: #111827; }
-    .btn-success { background: #22c55e; color: #fff; }
-    .btn:disabled { opacity: 0.65; cursor: default; }
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+    .btn-primary:disabled { opacity: 0.7; cursor: default; }
 
-    .content {
-      flex: 1;
-      padding: 0.85rem 1rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
     }
 
-    .hidden { display: none !important; }
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
 
-    .progress {
+    .muted {
+      color: #6b7280;
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .topline {
       display: flex;
+      align-items: center;
       justify-content: space-between;
       gap: 0.75rem;
-      align-items: baseline;
-      color: #666;
-      font-size: 0.82rem;
+      margin-bottom: 0.9rem;
     }
 
-    .card {
+    .question-title {
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
+
+    .question-full {
+      background: #f9fafb;
       border: 1px solid #eee;
       border-radius: 12px;
-      padding: 0.85rem;
-      background: #fff;
-    }
-
-    .badge {
-      display: inline-block;
-      font-size: 0.72rem;
-      padding: 0.18rem 0.55rem;
-      border-radius: 999px;
-      background: #eef2ff;
-      color: #3730a3;
-      margin-bottom: 0.45rem;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .q-title {
-      font-size: 0.98rem;
-      font-weight: 650;
-      margin-bottom: 0.5rem;
-      line-height: 1.25;
-    }
-
-    .q-full {
+      padding: 0.65rem 0.7rem;
       font-size: 0.9rem;
       line-height: 1.35;
-      background: #f9fafb;
-      border-radius: 10px;
-      padding: 0.65rem 0.7rem;
-      border: 1px solid #eee;
+      color: #111827;
+      margin-bottom: 0.9rem;
     }
 
     .status-buttons {
       display: flex;
-      gap: 0.45rem;
+      gap: 0.5rem;
       flex-wrap: wrap;
-      margin-top: 0.65rem;
+      margin: 0.2rem 0 0.9rem;
     }
 
     .status-btn {
       flex: 1;
-      min-width: 120px;
+      min-width: 130px;
       border-radius: 999px;
-      padding: 0.45rem;
-      font-size: 0.85rem;
+      padding: 0.55rem 0.6rem;
+      font-size: 0.9rem;
+      font-weight: 800;
       border: 1px solid #ddd;
       background: #fff;
       cursor: pointer;
     }
-
     .status-btn.active {
-      border-color: #0070f3;
-      background: #e0f2fe;
-      color: #0369a1;
-      font-weight: 650;
-    }
-
-    .extras {
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-      margin-top: 0.7rem;
-    }
-
-    .extras label {
-      font-size: 0.82rem;
-      font-weight: 650;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 70px;
-      font-size: 0.85rem;
-      padding: 0.55rem;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      resize: vertical;
+      border-color: #2563eb;
+      background: #eff6ff;
+      color: #1d4ed8;
     }
 
     .photo-preview {
+      margin-top: 0.6rem;
       display: flex;
-      gap: 0.35rem;
       flex-wrap: wrap;
-      margin-top: 0.35rem;
+      gap: 0.4rem;
     }
-
-    .photo-preview img {
-      width: 74px;
-      height: 74px;
+    .photo-thumb {
+      width: 78px;
+      height: 78px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #ddd;
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.5rem;
-      margin-top: 0.85rem;
+      background: #fff;
     }
 
     .footer {
       border-top: 1px solid #eee;
-      background: #fafafa;
+      background: #fff;
       padding: 0.75rem 1rem;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 0.75rem;
       flex-wrap: wrap;
     }
 
-    .footer small { color: #666; font-size: 0.8rem; }
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 200px;
+    }
 
-    @media (max-width: 420px) {
+    .progress {
+      font-size: 0.82rem;
+      color: #374151;
+      font-weight: 700;
+    }
+
+    .progress small {
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      flex: 1;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 520px) {
       body { padding: 0.5rem; }
-      .setup input, .setup select { min-width: 140px; }
-      .status-btn { min-width: 100px; }
-      .q-title { font-size: 0.95rem; }
+      .stage { padding: 0.85rem; }
+      .status-btn { min-width: 0; }
+      .field { min-width: 140px; }
     }
   </style>
 </head>
 
 <body>
-<div class="app-shell">
-  <header>
-    <h1>OSHA Self-Inspection</h1>
-    <small>Select an area, then answer questions one at a time. “Observed?” questions can skip entire sections.</small>
-  </header>
+  <div class="app-shell">
+    <header>
+      <h1>OSHA Self-Inspection</h1>
+      <small>Select an area → answer one question at a time → submit.</small>
+    </header>
 
-  <!-- SETUP (area required before loading questions) -->
-  <div class="setup" id="setup">
-    <div class="row">
-      <input id="inspectorName" type="text" placeholder="Inspector name (required)" />
-      <input id="inspectorEmail" type="email" placeholder="Email (required)" />
-    </div>
-    <div class="row">
-      <select id="areaSelect" aria-label="Area">
-        <option value="">Loading areas…</option>
-      </select>
-      <button class="btn btn-primary" id="startBtn" disabled>Start inspection</button>
-    </div>
-    <small id="setupHint">Choose an area to load the right checklist.</small>
-  </div>
-
-  <!-- QUESTION VIEW -->
-  <div class="content hidden" id="wizard">
-    <div class="progress">
-      <div><span id="progressText">Question 0 of 0</span></div>
-      <div><span id="progressCat"></span></div>
-    </div>
-
-    <div class="card">
-      <div class="badge" id="qCategory">Category</div>
-      <div class="q-title" id="qShort">Short issue</div>
-      <div class="q-full" id="qFull">Full question text…</div>
-
-      <div class="status-buttons">
-        <button class="status-btn" id="btnYes">✔ Yes</button>
-        <button class="status-btn" id="btnNo">❌ No</button>
-        <button class="status-btn" id="btnNA">➖ N/A</button>
-      </div>
-
-      <div class="extras">
-        <div>
-          <label for="commentInput">Comments / Notes (optional)</label>
-          <textarea id="commentInput" placeholder="Add context, location, follow-up needed, etc."></textarea>
+    <!-- STAGE 1: SETUP (Area + Inspector) -->
+    <section class="stage active" id="stageSetup">
+      <div class="card">
+        <div class="topline">
+          <div>
+            <div class="pill">Step 1 of 2</div>
+            <div style="height:6px"></div>
+            <div style="font-size:1.05rem;font-weight:800;">Start an inspection</div>
+            <div style="height:6px"></div>
+            <div class="muted">Pick the area you’re inspecting and enter your info. Then we’ll load only the relevant questions.</div>
+          </div>
         </div>
 
-        <div>
-          <label for="photoInput">Photos (optional)</label>
-          <input type="file" id="photoInput" accept="image/*" multiple />
-          <div class="photo-preview" id="photoPreview"></div>
+        <div class="row">
+          <div class="field">
+            <label for="areaSelect">Area</label>
+            <select id="areaSelect">
+              <option value="">Loading areas…</option>
+            </select>
+          </div>
         </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="inspectorName">Inspector name</label>
+            <input id="inspectorName" type="text" placeholder="Jane Doe" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="inspectorEmail">Email</label>
+            <input id="inspectorEmail" type="email" placeholder="jane@company.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div style="height: 12px;"></div>
+
+        <button class="btn btn-primary" id="beginBtn">Begin inspection</button>
+
+        <div style="height: 10px;"></div>
+        <div class="muted" id="setupHint"></div>
+      </div>
+    </section>
+
+    <!-- STAGE 2: WIZARD QUESTION -->
+    <section class="stage" id="stageWizard">
+      <div class="card">
+        <div class="topline">
+          <div>
+            <div class="pill" id="catPill">Category</div>
+            <div style="height:8px"></div>
+            <div class="question-title" id="shortIssue">Question</div>
+          </div>
+          <div class="pill" id="idxPill">0 / 0</div>
+        </div>
+
+        <div class="question-full" id="fullIssue"></div>
+
+        <div>
+          <label>Status</label>
+          <div class="status-buttons">
+            <button class="status-btn" id="btnYes" type="button">✅ Yes</button>
+            <button class="status-btn" id="btnNo" type="button">❌ No</button>
+            <button class="status-btn" id="btnNA" type="button">➖ N/A</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="commentInput">Comments / notes (optional)</label>
+            <textarea id="commentInput" placeholder="Add context, location details, corrective action needed, etc."></textarea>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="photoInput">Photos (optional)</label>
+            <input type="file" id="photoInput" accept="image/*" multiple />
+            <div class="photo-preview" id="photoPreview"></div>
+          </div>
+        </div>
+
+        <div class="muted" id="skipHint" style="margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- FOOTER NAV -->
+    <div class="footer" id="footer" style="display:none;">
+      <div class="footer-left">
+        <div class="progress" id="progressText">0 / 0 <small>answered</small></div>
+        <div class="muted" id="areaText"></div>
       </div>
 
-      <div class="nav">
-        <button class="btn btn-secondary" id="prevBtn">Back</button>
-        <button class="btn btn-primary" id="nextBtn">Next</button>
+      <div class="footer-actions">
+        <button class="btn btn-secondary" id="backBtn" type="button">Back</button>
+        <button class="btn btn-secondary" id="nextBtn" type="button">Next</button>
+        <button class="btn btn-primary" id="submitBtn" type="button">Submit</button>
+        <button class="btn btn-danger" id="resetBtn" type="button">Reset</button>
       </div>
     </div>
   </div>
 
-  <!-- FOOTER SUBMIT -->
-  <div class="footer">
-    <small id="footerStatus">Not started</small>
-    <button class="btn btn-success" id="submitBtn" disabled>Submit</button>
-  </div>
-</div>
+  <script>
+    /********************
+     * CONFIG
+     ********************/
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznXNi6HRD8qpn3whwdxsj9X0dq7xdii-Gn7pPqzsNvnGoJQ1G5ephp1yhUlnqd-qW1/exec";
+    const STORAGE_KEY = "osha_inspection_wizard_v1";
 
-<script>
-/**
- * CONFIG
- * - SCRIPT_URL is your deployed Apps Script web app URL (ends in /exec)
- */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznXNi6HRD8qpn3whwdxsj9X0dq7xdii-Gn7pPqzsNvnGoJQ1G5ephp1yhUlnqd-qW1/exec";
-const STORAGE_KEY = "osha_wizard_v1";
+    /********************
+     * DOM
+     ********************/
+    const stageSetup = document.getElementById("stageSetup");
+    const stageWizard = document.getElementById("stageWizard");
+    const footer = document.getElementById("footer");
 
-/**
- * OBSERVED QUESTIONS (by ID) — you provided these
- * When user answers NO to an observed question, we skip all upcoming questions with the same Followup_Group.
- */
-const OBSERVED_IDS = new Set([7, 13, 23, 28, 35, 48]);
+    const areaSelect = document.getElementById("areaSelect");
+    const inspectorNameInput = document.getElementById("inspectorName");
+    const inspectorEmailInput = document.getElementById("inspectorEmail");
+    const beginBtn = document.getElementById("beginBtn");
+    const setupHint = document.getElementById("setupHint");
 
-/**
- * DOM
- */
-const setupEl = document.getElementById("setup");
-const wizardEl = document.getElementById("wizard");
-const startBtn = document.getElementById("startBtn");
-const submitBtn = document.getElementById("submitBtn");
+    const catPill = document.getElementById("catPill");
+    const idxPill = document.getElementById("idxPill");
+    const shortIssueEl = document.getElementById("shortIssue");
+    const fullIssueEl = document.getElementById("fullIssue");
 
-const inspectorNameInput = document.getElementById("inspectorName");
-const inspectorEmailInput = document.getElementById("inspectorEmail");
-const areaSelect = document.getElementById("areaSelect");
-const setupHint = document.getElementById("setupHint");
-const footerStatus = document.getElementById("footerStatus");
+    const btnYes = document.getElementById("btnYes");
+    const btnNo = document.getElementById("btnNo");
+    const btnNA = document.getElementById("btnNA");
 
-const progressText = document.getElementById("progressText");
-const progressCat = document.getElementById("progressCat");
+    const commentInput = document.getElementById("commentInput");
+    const photoInput = document.getElementById("photoInput");
+    const photoPreview = document.getElementById("photoPreview");
+    const skipHint = document.getElementById("skipHint");
 
-const qCategory = document.getElementById("qCategory");
-const qShort = document.getElementById("qShort");
-const qFull = document.getElementById("qFull");
+    const progressText = document.getElementById("progressText");
+    const areaText = document.getElementById("areaText");
 
-const btnYes = document.getElementById("btnYes");
-const btnNo  = document.getElementById("btnNo");
-const btnNA  = document.getElementById("btnNA");
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
-const commentInput = document.getElementById("commentInput");
-const photoInput = document.getElementById("photoInput");
-const photoPreview = document.getElementById("photoPreview");
+    /********************
+     * STATE
+     ********************/
+    let AREAS = [];
+    let QUESTION_BANK = [];
+    let LOGIC_RULES = [];
 
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
+    // active question list for current area (includes questions that *may* be hidden by logic)
+    let questions = [];
 
-/**
- * STATE
- */
-let AREAS = [];
-let QUESTION_BANK = [];    // normalized questions
-let FLOW = [];             // area-filtered, active, sorted questions used in this run
-let idx = 0;               // current index in FLOW
+    // answers keyed by question id: {status, comments, photos[]}
+    let answers = new Map();
 
-// answers keyed by question id
-let answers = new Map();   // id -> {status:'yes'|'no'|'na', comments:'', photos:[base64...]}
+    // set of followup groups currently hidden
+    let hiddenGroups = new Set();
 
-// set of followup groups to skip (when observed==no)
-let skipGroups = new Set();
+    // wizard position
+    let idx = 0;
 
-function safeTrim(v) { return String(v ?? "").trim(); }
-function isTrue(v) { return String(v ?? "").toUpperCase() === "TRUE"; }
+    // session info
+    let session = {
+      areaId: "",
+      areaName: "",
+      inspectorName: "",
+      inspectorEmail: ""
+    };
 
-/**
- * JSONP GET (GitHub Pages safe)
- */
-function apiGet(action) {
-  return new Promise((resolve, reject) => {
-    const cb = "cb_" + action + "_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
+    /********************
+     * UTIL
+     ********************/
+    function safeTrim(v){ return String(v ?? "").trim(); }
+    function isTrue(v){ return String(v ?? "").toUpperCase() === "TRUE"; }
 
-    window[cb] = (data) => {
+    // Convert any legacy trigger/status values into yes/no/na
+    function normalizeStatus(v){
+      const s = String(v || "").toLowerCase().trim();
+      if (s === "needs_attention") return "no";
+      if (s === "compliant") return "yes";
+      if (s === "na") return "na";
+      if (s === "n/a") return "na";
+      return s; // yes/no/na
+    }
+
+    function setStage(which){
+      if (which === "setup") {
+        stageSetup.classList.add("active");
+        stageWizard.classList.remove("active");
+        footer.style.display = "none";
+      } else {
+        stageSetup.classList.remove("active");
+        stageWizard.classList.add("active");
+        footer.style.display = "flex";
+      }
+    }
+
+    function apiGet(action){
+      // JSONP (works from GitHub Pages)
+      return new Promise((resolve, reject) => {
+        const cb = "cb_" + action + "_" + Math.random().toString(36).slice(2);
+        const script = document.createElement("script");
+
+        window[cb] = (data) => {
+          try {
+            delete window[cb];
+            script.remove();
+            if (!data || data.result !== "success") return reject(new Error(`API ${action} failed`));
+            resolve(data.rows || []);
+          } catch (err) { reject(err); }
+        };
+
+        script.onerror = () => {
+          delete window[cb];
+          script.remove();
+          reject(new Error(`Failed to load API ${action}`));
+        };
+
+        script.src = `${SCRIPT_URL}?action=${encodeURIComponent(action)}&callback=${encodeURIComponent(cb)}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    function saveState(){
+      const payload = {
+        session,
+        idx,
+        hiddenGroups: Array.from(hiddenGroups),
+        answers: Array.from(answers.entries())
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    }
+
+    function loadState(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
       try {
-        delete window[cb];
-        script.remove();
-        if (!data || data.result !== "success") return reject(new Error(`API ${action} failed`));
-        resolve(data.rows || []);
-      } catch (err) {
-        reject(err);
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.session) return false;
+
+        session = parsed.session;
+        idx = Number(parsed.idx || 0);
+        hiddenGroups = new Set(parsed.hiddenGroups || []);
+        answers = new Map(parsed.answers || []);
+
+        return true;
+      } catch {
+        return false;
       }
-    };
-
-    script.onerror = () => {
-      delete window[cb];
-      script.remove();
-      reject(new Error(`Failed to load API ${action}`));
-    };
-
-    script.src = `${SCRIPT_URL}?action=${encodeURIComponent(action)}&callback=${encodeURIComponent(cb)}`;
-    document.body.appendChild(script);
-  });
-}
-
-/**
- * Normalize rows from Question_Bank
- * Expected headers include:
- * ID, Category, ShortIssue, FullIssue, Area_Tags, Active, Requires_Photo, Requires_Comment, Followup_Group, Order
- */
-function normalizeQuestionRow(row) {
-  const id = Number(safeTrim(row.ID));
-  return {
-    id,
-    category: safeTrim(row.Category),
-    shortIssue: safeTrim(row.ShortIssue),
-    fullIssue: safeTrim(row.FullIssue),
-    areaTags: safeTrim(row.Area_Tags || "ALL"),
-    active: isTrue(row.Active),
-    requiresPhoto: isTrue(row.Requires_Photo),
-    requiresComment: isTrue(row.Requires_Comment),
-    followupGroup: safeTrim(row.Followup_Group || ""),
-    order: Number(row.Order || 9999),
-  };
-}
-
-function areaAllows(q, areaId) {
-  const tags = safeTrim(q.areaTags || "ALL").split(",").map(t => t.trim()).filter(Boolean);
-  return tags.includes("ALL") || tags.includes(areaId);
-}
-
-/**
- * Persistence (so if someone refreshes mid-inspection, they can recover)
- */
-function saveState() {
-  const obj = {
-    idx,
-    skipGroups: Array.from(skipGroups),
-    answers: Array.from(answers.entries()),
-    areaId: areaSelect.value || ""
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
-}
-
-function clearState() {
-  localStorage.removeItem(STORAGE_KEY);
-}
-
-function loadStateMaybe() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return false;
-  try {
-    const parsed = JSON.parse(raw);
-    if (parsed && Array.isArray(parsed.answers)) {
-      idx = Number(parsed.idx || 0);
-      skipGroups = new Set(parsed.skipGroups || []);
-      answers = new Map(parsed.answers || []);
-      if (parsed.areaId) areaSelect.value = parsed.areaId;
-      return true;
     }
-  } catch {}
-  return false;
-}
 
-/**
- * UI helpers
- */
-function setStatusButtons(status) {
-  [btnYes, btnNo, btnNA].forEach(b => b.classList.remove("active"));
-  if (status === "yes") btnYes.classList.add("active");
-  if (status === "no")  btnNo.classList.add("active");
-  if (status === "na")  btnNA.classList.add("active");
-}
+    function hardReset(){
+      localStorage.removeItem(STORAGE_KEY);
+      answers = new Map();
+      hiddenGroups = new Set();
+      idx = 0;
+      session = { areaId:"", areaName:"", inspectorName:"", inspectorEmail:"" };
 
-function setPhotosPreview(photos) {
-  photoPreview.innerHTML = "";
-  (photos || []).forEach(src => {
-    const img = document.createElement("img");
-    img.src = src;
-    photoPreview.appendChild(img);
-  });
-}
+      inspectorNameInput.value = "";
+      inspectorEmailInput.value = "";
+      setupHint.textContent = "";
+      setStage("setup");
+    }
 
-function currentQuestion() {
-  return FLOW[idx] || null;
-}
+    /********************
+     * NORMALIZE SHEET ROWS
+     ********************/
+    function normalizeAreaRow(r){
+      return {
+        id: safeTrim(r.Area_ID ?? r.area_id ?? r.ID ?? ""),
+        name: safeTrim(r.Area_Name ?? r.area_name ?? r.Name ?? r.Area ?? ""),
+        active: isTrue(r.Active ?? r.active ?? "TRUE"),
+        order: Number(r.Order || 9999)
+      };
+    }
 
-function updateFooter() {
-  const answeredCount = Array.from(answers.values()).filter(a => a && a.status).length;
-  footerStatus.textContent = `Answered ${answeredCount} / ${FLOW.length}`;
-  submitBtn.disabled = (answeredCount === 0);
-}
+    function normalizeQuestionRow(r){
+      // Expected headers in Question_Bank:
+      // ID, Category, ShortIssue, FullIssue, Area_Tags, Active, Followup_Group, Order, etc.
+      const id = Number(safeTrim(r.ID));
+      return {
+        id,
+        category: safeTrim(r.Category),
+        shortIssue: safeTrim(r.ShortIssue),
+        fullIssue: safeTrim(r.FullIssue),
+        areaTags: safeTrim(r.Area_Tags || "ALL"),
+        active: isTrue(r.Active),
+        followupGroup: safeTrim(r.Followup_Group || ""),
+        order: Number(r.Order || 9999)
+      };
+    }
 
-/**
- * Navigation with skipping
- */
-function isSkippedQuestion(q) {
-  if (!q) return true;
-  if (!q.followupGroup) return false;
-  return skipGroups.has(q.followupGroup);
-}
+    function normalizeLogicRow(r){
+      return {
+        triggerId: Number(safeTrim(r.Trigger_Question_ID)),
+        triggerStatus: normalizeStatus(r.Trigger_Status),
+        affectedGroup: safeTrim(r.Affected_Group),
+        action: safeTrim(r.Action).toUpperCase()
+      };
+    }
 
-function jumpToNextValid(fromIndex) {
-  let j = fromIndex;
-  while (j < FLOW.length && isSkippedQuestion(FLOW[j])) j++;
-  return j;
-}
+    /********************
+     * BUILD QUESTIONS FOR AREA
+     ********************/
+    function questionAppliesToArea(q, areaId){
+      const tags = safeTrim(q.areaTags || "ALL")
+        .split(",")
+        .map(t => t.trim())
+        .filter(Boolean);
 
-function jumpToPrevValid(fromIndex) {
-  let j = fromIndex;
-  while (j >= 0 && isSkippedQuestion(FLOW[j])) j--;
-  return j;
-}
+      return tags.includes("ALL") || tags.includes(areaId);
+    }
 
-/**
- * Render current question
- */
-function render() {
-  const q = currentQuestion();
-  if (!q) {
-    // finished
-    wizardEl.classList.add("hidden");
-    footerStatus.textContent = `Ready to submit — ${Array.from(answers.values()).filter(a => a.status).length} answered`;
-    submitBtn.disabled = false;
-    return;
-  }
+    function rebuildQuestionsForArea(){
+      const areaId = session.areaId;
 
-  // Progress
-  progressText.textContent = `Question ${idx + 1} of ${FLOW.length}`;
-  progressCat.textContent = q.category || "";
+      questions = QUESTION_BANK
+        .filter(q => q.active)
+        .filter(q => questionAppliesToArea(q, areaId))
+        .sort((a,b) => a.order - b.order);
 
-  // Question text
-  qCategory.textContent = q.category || "";
-  qShort.textContent = q.shortIssue || "";
-  qFull.textContent = q.fullIssue || "";
+      // Clamp idx to range
+      if (idx < 0) idx = 0;
+      if (idx >= questions.length) idx = Math.max(questions.length - 1, 0);
+    }
 
-  // Load existing answer if any
-  const a = answers.get(q.id) || { status: null, comments: "", photos: [] };
-  setStatusButtons(a.status);
-  commentInput.value = a.comments || "";
-  setPhotosPreview(a.photos || []);
-  photoInput.value = "";
+    /********************
+     * WIZARD NAV
+     ********************/
+    function currentQuestion(){
+      return questions[idx] || null;
+    }
 
-  // Buttons
-  prevBtn.disabled = (jumpToPrevValid(idx - 1) < 0);
-  nextBtn.textContent = (idx >= FLOW.length - 1) ? "Finish" : "Next";
+    function isHiddenByLogic(q){
+      if (!q.followupGroup) return false;
+      return hiddenGroups.has(q.followupGroup);
+    }
 
-  updateFooter();
-  saveState();
-}
-
-function setStatus(status) {
-  const q = currentQuestion();
-  if (!q) return;
-
-  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
-  answers.set(q.id, { ...existing, status });
-  setStatusButtons(status);
-
-  // OBSERVED? logic:
-  // If this is an observed question and user answers NO,
-  // then skip all questions sharing its followupGroup.
-  if (OBSERVED_IDS.has(q.id) && status === "no" && q.followupGroup) {
-    skipGroups.add(q.followupGroup);
-  }
-
-  // If they change observed from NO -> YES/NA, remove the skip
-  if (OBSERVED_IDS.has(q.id) && status !== "no" && q.followupGroup) {
-    skipGroups.delete(q.followupGroup);
-  }
-
-  updateFooter();
-  saveState();
-}
-
-/**
- * Wire status buttons
- */
-btnYes.onclick = () => setStatus("yes");
-btnNo.onclick  = () => setStatus("no");
-btnNA.onclick  = () => setStatus("na");
-
-/**
- * Comments/photos inputs
- */
-commentInput.oninput = (e) => {
-  const q = currentQuestion(); if (!q) return;
-  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
-  answers.set(q.id, { ...existing, comments: e.target.value });
-  saveState();
-};
-
-photoInput.onchange = (e) => {
-  const q = currentQuestion(); if (!q) return;
-  const files = Array.from(e.target.files || []);
-  if (!files.length) return;
-
-  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
-  const photos = Array.isArray(existing.photos) ? [...existing.photos] : [];
-
-  let remaining = files.length;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      photos.push(evt.target.result);
-      remaining--;
-      if (remaining === 0) {
-        answers.set(q.id, { ...existing, photos });
-        setPhotosPreview(photos);
-        saveState();
+    function findNextIndex(fromIdx, direction){
+      // direction: +1 or -1
+      let i = fromIdx;
+      while (true) {
+        i += direction;
+        if (i < 0 || i >= questions.length) return -1;
+        const q = questions[i];
+        if (!q) continue;
+        if (isHiddenByLogic(q)) continue;
+        return i;
       }
-    };
-    reader.readAsDataURL(file);
-  });
-};
+    }
 
-/**
- * Next/Back
- * - If a question has no status, we still allow Next (you can enforce if you want)
- * - Next jumps over skipped groups
- */
-prevBtn.onclick = () => {
-  const j = jumpToPrevValid(idx - 1);
-  if (j >= 0) idx = j;
-  render();
-};
+    function countAnsweredVisible(){
+      let visibleCount = 0;
+      let answeredCount = 0;
 
-nextBtn.onclick = () => {
-  // advance to next valid
-  let j = jumpToNextValid(idx + 1);
-  if (j >= FLOW.length) {
-    // finished
-    idx = FLOW.length; // render() will show finish state
-    render();
-    return;
-  }
-  idx = j;
-  render();
-};
+      questions.forEach(q => {
+        if (!q) return;
+        if (isHiddenByLogic(q)) return;
+        visibleCount++;
+        const a = answers.get(q.id);
+        if (a && a.status) answeredCount++;
+      });
 
-/**
- * Load areas + questions, but only build FLOW after user chooses area and clicks Start
- */
-async function init() {
-  // Load areas
-  AREAS = await apiGet("areas");
-  const activeAreas = AREAS
-    .filter(a => String(a.Active ?? a.active ?? "").toUpperCase() === "TRUE")
-    .sort((a,b) => Number(a.Order || 9999) - Number(b.Order || 9999));
+      return { visibleCount, answeredCount };
+    }
 
-  areaSelect.innerHTML = `<option value="">Select area (required)</option>` + activeAreas.map(a => {
-    const id = safeTrim(a.Area_ID || a.area_id || "");
-    const name = safeTrim(a.Area_Name || a.area_name || id);
-    return `<option value="${id}">${name}</option>`;
-  }).join("");
+    function updateFooter(){
+      const { visibleCount, answeredCount } = countAnsweredVisible();
+      progressText.innerHTML = `${answeredCount} / ${visibleCount} <small>answered</small>`;
+      areaText.textContent = `Area: ${session.areaName || session.areaId || "—"}`;
 
-  // Load questions
-  const qbRows = await apiGet("questions");
-  QUESTION_BANK = qbRows.map(normalizeQuestionRow).filter(q => q.active);
+      backBtn.disabled = (findNextIndex(idx, -1) === -1);
+      nextBtn.disabled = (findNextIndex(idx, +1) === -1);
 
-  // Enable start only when area selected
-  function validateStart() {
-    const okArea = !!safeTrim(areaSelect.value);
-    startBtn.disabled = !okArea;
-    setupHint.textContent = okArea ? "Ready. Click Start inspection." : "Choose an area to load the right checklist.";
-  }
-  areaSelect.onchange = validateStart;
-  validateStart();
+      // Show submit only when at end OR all answered
+      const allDone = (visibleCount > 0 && answeredCount === visibleCount);
+      submitBtn.classList.toggle("hidden", !allDone);
 
-  // If user had state saved, allow restore
-  const restored = loadStateMaybe();
-  if (restored && safeTrim(areaSelect.value)) {
-    setupHint.textContent = "Found an in-progress inspection for this device. Click Start to resume.";
-    startBtn.disabled = false;
-  }
-}
+      // If there are no questions, submit hidden
+      if (visibleCount === 0) submitBtn.classList.add("hidden");
+    }
 
-startBtn.onclick = () => {
-  const areaId = safeTrim(areaSelect.value);
-  if (!areaId) { alert("Please select an area."); return; }
+    function setStatusButtons(status){
+      [btnYes, btnNo, btnNA].forEach(b => b.classList.remove("active"));
+      if (status === "yes") btnYes.classList.add("active");
+      if (status === "no") btnNo.classList.add("active");
+      if (status === "na") btnNA.classList.add("active");
+    }
 
-  // Build FLOW for this area
-  FLOW = QUESTION_BANK
-    .filter(q => areaAllows(q, areaId))
-    .sort((a,b) => a.order - b.order);
+    function renderQuestion(){
+      const q = currentQuestion();
+      if (!q) {
+        shortIssueEl.textContent = "No questions found for this area.";
+        fullIssueEl.textContent = "";
+        catPill.textContent = "—";
+        idxPill.textContent = "0 / 0";
+        skipHint.textContent = "";
+        setStatusButtons(null);
+        commentInput.value = "";
+        photoPreview.innerHTML = "";
+        updateFooter();
+        return;
+      }
 
-  // If starting fresh (no saved state or mismatched area), reset
-  const savedRaw = localStorage.getItem(STORAGE_KEY);
-  if (!savedRaw) {
-    idx = 0;
-    skipGroups = new Set();
-    answers = new Map();
-  } else {
-    // ensure idx is within bounds for this FLOW
-    if (idx < 0 || idx >= FLOW.length) idx = 0;
-  }
+      // If current question is hidden, jump forward (or backward)
+      if (isHiddenByLogic(q)) {
+        const next = findNextIndex(idx, +1);
+        const prev = findNextIndex(idx, -1);
+        if (next !== -1) idx = next;
+        else if (prev !== -1) idx = prev;
+      }
 
-  // Ensure we start on first non-skipped
-  idx = jumpToNextValid(idx);
-  if (idx >= FLOW.length) idx = 0;
+      const q2 = currentQuestion();
+      if (!q2) return renderQuestion();
 
-  // Show wizard
-  setupEl.classList.add("hidden");
-  wizardEl.classList.remove("hidden");
+      catPill.textContent = q2.category || "Category";
+      shortIssueEl.textContent = q2.shortIssue || "Question";
+      fullIssueEl.textContent = q2.fullIssue || "";
 
-  footerStatus.textContent = "In progress…";
-  render();
-};
+      // visible index pill (count visible position)
+      const visibleQs = questions.filter(x => x && !isHiddenByLogic(x));
+      const visiblePos = visibleQs.findIndex(x => x.id === q2.id) + 1;
+      idxPill.textContent = `${visiblePos} / ${visibleQs.length}`;
 
-/**
- * Submit
- */
-async function submitInspection() {
-  const name = inspectorNameInput.value.trim();
-  const email = inspectorEmailInput.value.trim();
-  const areaId = safeTrim(areaSelect.value);
+      const a = answers.get(q2.id) || { status: null, comments: "", photos: [] };
+      setStatusButtons(a.status || null);
+      commentInput.value = a.comments || "";
+      renderPhotoPreview(a.photos || []);
 
-  if (!name || !email) {
-    alert("Please enter your name and email before submitting.");
-    return;
-  }
-  if (!areaId) {
-    alert("Please select an area before submitting.");
-    return;
-  }
+      // hint about logic group
+      if (q2.followupGroup) {
+        skipHint.textContent = `Logic group: ${q2.followupGroup} (${hiddenGroups.has(q2.followupGroup) ? "hidden" : "visible"})`;
+      } else {
+        skipHint.textContent = "";
+      }
 
-  const items = [];
-  for (const q of FLOW) {
-    const a = answers.get(q.id);
-    if (!a || !a.status) continue;
+      updateFooter();
+      saveState();
+    }
 
-    items.push({
-      id: q.id,
-      category: q.category,
-      shortIssue: q.shortIssue,
-      fullIssue: q.fullIssue,
-      status: a.status,            // yes | no | na
-      photos: a.photos || [],
-      comments: a.comments || ""
+    function renderPhotoPreview(photos){
+      photoPreview.innerHTML = "";
+      (photos || []).forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "photo-thumb";
+        photoPreview.appendChild(img);
+      });
+    }
+
+    function applyRulesForAnswer(questionId, status){
+      // Run through all rules matching this trigger
+      LOGIC_RULES.forEach(rule => {
+        if (rule.triggerId !== questionId) return;
+        if (rule.triggerStatus !== status) return;
+
+        if (rule.action === "HIDE") hiddenGroups.add(rule.affectedGroup);
+        if (rule.action === "SHOW") hiddenGroups.delete(rule.affectedGroup);
+      });
+    }
+
+    function setAnswerStatus(status){
+      const q = currentQuestion();
+      if (!q) return;
+
+      const normalized = normalizeStatus(status);
+
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+      answers.set(q.id, { ...existing, status: normalized });
+
+      setStatusButtons(normalized);
+
+      // Apply logic rules
+      applyRulesForAnswer(q.id, normalized);
+
+      // If after applying rules the next questions in group are hidden, we can auto-advance
+      updateFooter();
+      saveState();
+    }
+
+    /********************
+     * EVENTS
+     ********************/
+    btnYes.addEventListener("click", () => setAnswerStatus("yes"));
+    btnNo.addEventListener("click", () => setAnswerStatus("no"));
+    btnNA.addEventListener("click", () => setAnswerStatus("na"));
+
+    commentInput.addEventListener("input", () => {
+      const q = currentQuestion();
+      if (!q) return;
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+      answers.set(q.id, { ...existing, comments: commentInput.value });
+      saveState();
     });
-  }
 
-  if (!items.length) {
-    alert("No answers yet.");
-    return;
-  }
+    photoInput.addEventListener("change", e => {
+      const q = currentQuestion();
+      if (!q) return;
 
-  const payload = { inspectorName: name, inspectorEmail: email, areaId, items };
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Submitting…";
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+      const photos = Array.isArray(existing.photos) ? [...existing.photos] : [];
 
-  try {
-    const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-    const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); } catch { throw new Error("Could not parse Apps Script response"); }
+      let pending = files.length;
 
-    if (!res.ok || !data || data.result !== "success") {
-      throw new Error(data && data.message ? data.message : "Apps Script error");
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = evt => {
+          photos.push(evt.target.result);
+          pending--;
+          if (pending === 0) {
+            answers.set(q.id, { ...existing, photos });
+            renderPhotoPreview(photos);
+            saveState();
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // allow re-upload same file later
+      photoInput.value = "";
+    });
+
+    backBtn.addEventListener("click", () => {
+      const prev = findNextIndex(idx, -1);
+      if (prev !== -1) {
+        idx = prev;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      const next = findNextIndex(idx, +1);
+      if (next !== -1) {
+        idx = next;
+        renderQuestion();
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      if (!confirm("Reset this inspection? This clears answers on this device.")) return;
+      hardReset();
+      location.reload();
+    });
+
+    beginBtn.addEventListener("click", () => {
+      const areaId = safeTrim(areaSelect.value);
+      const name = safeTrim(inspectorNameInput.value);
+      const email = safeTrim(inspectorEmailInput.value);
+
+      if (!areaId) { alert("Please select an area."); return; }
+      if (!name || !email) { alert("Please enter your name and email."); return; }
+
+      const areaObj = AREAS.find(a => a.id === areaId);
+      session.areaId = areaId;
+      session.areaName = areaObj ? areaObj.name : areaId;
+      session.inspectorName = name;
+      session.inspectorEmail = email;
+
+      rebuildQuestionsForArea();
+
+      // Move idx to first visible question
+      idx = 0;
+      const firstVisible = isHiddenByLogic(questions[0]) ? findNextIndex(-1, +1) : 0;
+      idx = firstVisible === -1 ? 0 : firstVisible;
+
+      setStage("wizard");
+      renderQuestion();
+    });
+
+    async function submitInspection(){
+      const name = safeTrim(session.inspectorName);
+      const email = safeTrim(session.inspectorEmail);
+      const areaId = safeTrim(session.areaId);
+
+      if (!name || !email || !areaId) {
+        alert("Missing inspector info or area. Please restart.");
+        hardReset();
+        return;
+      }
+
+      // Only send visible questions that have a status
+      const items = questions
+        .filter(q => q && !isHiddenByLogic(q))
+        .map(q => {
+          const a = answers.get(q.id) || {};
+          return {
+            id: q.id,
+            category: q.category,
+            shortIssue: q.shortIssue,
+            fullIssue: q.fullIssue,
+            status: a.status || "",
+            photos: a.photos || [],
+            comments: a.comments || ""
+          };
+        })
+        .filter(x => x.status); // only answered items
+
+      if (!items.length) {
+        alert("No answered items to submit yet.");
+        return;
+      }
+
+      const payload = {
+        inspectorName: name,
+        inspectorEmail: email,
+        areaId: areaId,
+        items
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { throw new Error("Apps Script did not return JSON"); }
+
+        if (!res.ok || !data || data.result !== "success") {
+          throw new Error((data && data.message) ? data.message : "Unknown submit error");
+        }
+
+        alert("Submitted! Starting a new blank inspection.");
+
+        // Clear everything for a fresh run
+        localStorage.removeItem(STORAGE_KEY);
+        answers = new Map();
+        hiddenGroups = new Set();
+        idx = 0;
+
+        // Keep areas loaded, go back to setup, clear inspector fields
+        inspectorNameInput.value = "";
+        inspectorEmailInput.value = "";
+        areaSelect.value = ""; // force re-select
+        setupHint.textContent = "Submission saved successfully.";
+
+        setStage("setup");
+
+      } catch (err) {
+        console.error(err);
+        alert("Error submitting inspection. Check console for details.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+      }
     }
 
-    alert("Submitted! Starting a new blank inspection.");
+    submitBtn.addEventListener("click", submitInspection);
 
-    // clear local state
-    clearState();
-    idx = 0;
-    skipGroups = new Set();
-    answers = new Map();
+    /********************
+     * INIT
+     ********************/
+    async function init(){
+      // Load config from Sheets
+      const [areaRows, qRows, logicRows] = await Promise.all([
+        apiGet("areas"),
+        apiGet("questions"),
+        apiGet("logic")
+      ]);
 
-    // reset UI back to setup (keep area selected so they can re-run quickly)
-    wizardEl.classList.add("hidden");
-    setupEl.classList.remove("hidden");
+      AREAS = areaRows.map(normalizeAreaRow)
+        .filter(a => a.active)
+        .sort((a,b) => a.order - b.order);
 
-    // optional: clear inspector info every time
-    inspectorNameInput.value = "";
-    inspectorEmailInput.value = "";
+      QUESTION_BANK = qRows.map(normalizeQuestionRow);
+      LOGIC_RULES = logicRows.map(normalizeLogicRow);
 
-    footerStatus.textContent = "Not started";
-    submitBtn.textContent = "Submit";
-    submitBtn.disabled = true;
+      // Populate area dropdown
+      areaSelect.innerHTML = `<option value="">Select area…</option>` + AREAS.map(a =>
+        `<option value="${a.id}">${a.name}</option>`
+      ).join("");
 
-  } catch (err) {
-    console.error(err);
-    alert("Submit failed — check console for details.");
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
-  }
-}
-submitBtn.onclick = submitInspection;
+      // Try restore state
+      const restored = loadState();
+      if (restored) {
+        // restore setup inputs
+        inspectorNameInput.value = session.inspectorName || "";
+        inspectorEmailInput.value = session.inspectorEmail || "";
 
-/**
- * Boot
- */
-init().catch(err => {
-  console.error(err);
-  alert("Failed to load areas/questions. Check console for details.");
-});
-</script>
+        // set area
+        if (session.areaId) {
+          areaSelect.value = session.areaId;
+          rebuildQuestionsForArea();
+
+          // go to wizard
+          setStage("wizard");
+          renderQuestion();
+          return;
+        }
+      }
+
+      setStage("setup");
+      setupHint.textContent = "Loaded successfully.";
+    }
+
+    init().catch(err => {
+      console.error(err);
+      setupHint.textContent = "Failed to load configuration. Check console.";
+      alert("Failed to load checklist from Google Sheet. Check console for details.");
+    });
+  </script>
 </body>
 </html>
