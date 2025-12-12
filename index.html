@@ -585,8 +585,27 @@ async function submitInspection() {
     });
     const text = await res.text();
     console.log("Script response:", text);
+
     if (!res.ok) throw new Error("Non-200 response: " + res.status);
-    alert("Inspection submitted!");
+
+    alert("Inspection submitted! Starting a new blank inspection...");
+
+    // 🔥 RESET EVERYTHING HERE
+    issues.forEach(i => {
+      i.status = null;
+      i.photos = [];
+      i.comments = "";
+    });
+
+    inspectorNameInput.value = "";
+    inspectorEmailInput.value = "";
+
+    saveIssues();
+    renderIssueList();
+
+    currentFilter = "All";
+    renderFilters();
+
   } catch (err) {
     console.error(err);
     alert("Error submitting inspection. Check console for details.");
