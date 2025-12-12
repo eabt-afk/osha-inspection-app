@@ -460,20 +460,29 @@ async function submitInspection() {
   btn.textContent = "Submitting...";
 
   try {
-    await fetch(SCRIPT_URL, {
+    const res = await fetch(SCRIPT_URL, {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload)   // no headers → defaults to text/plain
     });
+
+    const text = await res.text();
+    // Optional: log what the script returned
+    console.log("Response from script:", text);
+
+    if (!res.ok) {
+      throw new Error("Non-200 response: " + res.status);
+    }
 
     alert("Inspection submitted!");
   } catch (err) {
-    alert("Error submitting inspection.");
+    console.error(err);
+    alert("Error submitting inspection. Check console for details.");
   } finally {
     btn.disabled = false;
     btn.textContent = "Submit";
   }
 }
+
 
 document.getElementById("submitBtn").onclick = submitInspection;
 
