@@ -84,6 +84,7 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
+      gap: 0.5rem;
     }
 
     .issue-text { font-size: 0.85rem; flex: 1; }
@@ -96,7 +97,7 @@
     /* Inspector bar at bottom */
     .inspector-bar {
       border-top: 1px solid #eee;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1rem;
       display: flex;
       gap: 0.5rem;
       align-items: center;
@@ -109,15 +110,22 @@
       display: flex;
       gap: 0.4rem;
       flex-wrap: wrap;
+      align-items: center;
     }
 
-    .inspector-fields input {
+    .inspector-fields input,
+    .inspector-fields select {
       flex: 1;
       min-width: 120px;
       font-size: 0.8rem;
-      padding: 0.3rem 0.4rem;
+      padding: 0.35rem 0.45rem;
       border-radius: 6px;
       border: 1px solid #ddd;
+      background: #fff;
+    }
+
+    .inspector-fields select {
+      min-width: 160px;
     }
 
     #submitBtn {
@@ -167,6 +175,7 @@
       display: flex;
       justify-content: space-between;
       gap: 0.5rem;
+      align-items: flex-start;
     }
 
     .detail-title { font-size: 0.95rem; font-weight: 600; }
@@ -184,6 +193,7 @@
       background: #f9fafb;
       padding: 0.5rem;
       border-radius: 8px;
+      line-height: 1.35;
     }
 
     .status-label,
@@ -197,10 +207,12 @@
       display: flex;
       gap: 0.4rem;
       margin-top: 0.25rem;
+      flex-wrap: wrap;
     }
 
     .status-btn {
       flex: 1;
+      min-width: 115px;
       border-radius: 999px;
       padding: 0.35rem;
       font-size: 0.8rem;
@@ -280,6 +292,9 @@
     <div class="inspector-fields">
       <input id="inspectorName" type="text" placeholder="Inspector name" />
       <input id="inspectorEmail" type="email" placeholder="Email" />
+      <select id="areaSelect" aria-label="Area">
+        <option value="">Loading areas…</option>
+      </select>
     </div>
     <button id="submitBtn">Submit</button>
   </div>
@@ -326,367 +341,186 @@
 </div>
 
 <script>
-/* 1) RAW DATA (from your JSON) */
-const rawIssues = [
-  {
-    "ID": "1",
-    "Category": "EAP",
-    "Short Issue": "Clear exit signs, lighting, and routes",
-    "Issue": "Are exits clearly marked “EXIT” and exit routes adequately lit? Access/egress routes are clear and unobstructed? 29 CFR 1910.37"
-  },
-  {
-    "ID": "2",
-    "Category": "EAP",
-    "Short Issue": "Accessible and inspected fire extinguishers",
-    "Issue": "Appropriate fire extinguishers are readily accessible; noted in good condition; tagged; and inspected (annual, monthly)? 29 CFR 1910.157"
-  },
-  {
-    "ID": "3",
-    "Category": "EAP",
-    "Short Issue": "Adequate exit routes",
-    "Issue": "Are the number of exit routes adequate? Are exits doors unlocked? Do exit route doors discharge to an open space that gives safe access? 29 CFR 1910.36"
-  },
-  {
-    "ID": "4",
-    "Category": "EAP",
-    "Short Issue": "First aid accessible and stocked",
-    "Issue": "Medical services and first aid readily are available? Are first-aid kits easily accessible to each work area, with necessary supplies available, periodically inspected and replenished as needed? 29 CFR 1910.151"
-  },
-  {
-    "ID": "5",
-    "Category": "EAP",
-    "Short Issue": "Eyewash/shower available for corrosives",
-    "Issue": "Emergency eye wash / shower facilities are located within the immediate work area where employees are exposed to corrosive materials? 29 CFR 1910.151"
-  },
-  {
-    "ID": "6",
-    "Category": "EAP",
-    "Short Issue": "Employees trained in EAP",
-    "Issue": "Employees are trained in the company's Emergency Action Plan (i.e. alarm system, evacuation routes, assembly areas, etc.)? 29 CFR 1910.38"
-  },
-  {
-    "ID": "7",
-    "Category": "Electrical",
-    "Short Issue": "Electrical exposure observed?",
-    "Issue": "Is any type of electrical exposure observed in the facility at the time of the evaluation?"
-  },
-  {
-    "ID": "8",
-    "Category": "Electrical",
-    "Short Issue": "Flexible cords in good condition",
-    "Issue": "Flexible cords and cables appeared in good condition (ground pin in place, free of splices, insulation)? 29 CFR 1910.305"
-  },
-  {
-    "ID": "9",
-    "Category": "Electrical",
-    "Short Issue": "Proper use of temporary wiring",
-    "Issue": "Temporary wiring is only used for construction, remodeling, maintenance, repair, or demolition of buildings, structures, or equipment, and similar activities? 29 CFR 1910.305"
-  },
-  {
-    "ID": "10",
-    "Category": "Electrical",
-    "Short Issue": "Energized parts properly guarded",
-    "Issue": "All energized parts of electrical circuits and equipment are guarded against accidental contact by approved cabinets or enclosures? 29 CFR 1910.303"
-  },
-  {
-    "ID": "11",
-    "Category": "Electrical",
-    "Short Issue": "Power strips used properly",
-    "Issue": "\"Power strips\" appear to be used in properly (i.e. have an ampere rating not less than the load to be served / typically not designed for high power loads)? 29 CFR 1910.303"
-  },
-  {
-    "ID": "12",
-    "Category": "Electrical",
-    "Short Issue": "Electrical safety training completed",
-    "Issue": "Affected employees are trained in and familiar with the electrical safety-related work practices? 29 CFR 1910.332"
-  },
-  {
-    "ID": "13",
-    "Category": "Fire Protection",
-    "Short Issue": "Flammable/hot-work exposures observed?",
-    "Issue": "Is any type of flammable storage / hot work exposure observed in the facility at the time of the evaluation?"
-  },
-  {
-    "ID": "14",
-    "Category": "Fire Protection",
-    "Short Issue": "Gas cylinders stored securely, capped",
-    "Issue": "Cylinders are stored properly (e.g. upright position, caps in place, protected from falling)? 29 CFR 1910.253"
-  },
-  {
-    "ID": "15",
-    "Category": "Fire Protection",
-    "Short Issue": "Flammable liquids within allowed quantities",
-    "Issue": "The incidental use of flammable and combustibles is properly stored? [ • 25 gallons of Class IA in containers; • 120 gallons of Class IB, IC, II, or III in containers; • 660 gallons of Class IB, IC, II, or III in a single portable tank ] 29 CFR 1910.106"
-  },
-  {
-    "ID": "16",
-    "Category": "Fire Protection",
-    "Short Issue": "Torch flashback arrestors installed",
-    "Issue": "Flashback arrestors are used on burning torches to prevent flashback into the compressed gas tanks? 29 CFR 1910.253"
-  },
-  {
-    "ID": "17",
-    "Category": "Hazard Communication",
-    "Short Issue": "Proper chemical container labeling",
-    "Issue": "Containers of hazardous chemicals in the workplace are labeled, tagged, or marked identifying the chemical it contains as well as the appropriate hazard warnings? 29 CFR 1910.1200"
-  },
-  {
-    "ID": "18",
-    "Category": "Hazard Communication",
-    "Short Issue": "SDS available for all chemicals",
-    "Issue": "Safety Data Sheets (SDSs) are in place for materials/chemicals on-site and are readily accessible to all employees? 29 CFR 1910.1200"
-  },
-  {
-    "ID": "19",
-    "Category": "Hazard Communication",
-    "Short Issue": "Employees trained on HazCom/GHS",
-    "Issue": "Employees have been trained on Hazard Communication /Globally Harmonized System (GHS)? 29 CFR 1910.1200"
-  },
-  {
-    "ID": "20",
-    "Category": "Housekeeping",
-    "Short Issue": "Adequate workspace around electrical equipment",
-    "Issue": "Is sufficient access and working space provided and maintained about all electrical equipment to permit ready and safe operations and maintenance (36”)? 29 CFR 1910.303"
-  },
-  {
-    "ID": "21",
-    "Category": "Housekeeping",
-    "Short Issue": "Floor kept clean and dry",
-    "Issue": "Is the floor of every work area maintained in a clean and, so far as possible, a dry condition? 29 CFR 1910.22"
-  },
-  {
-    "ID": "22",
-    "Category": "Housekeeping",
-    "Short Issue": "Aisles clear and marked",
-    "Issue": "Are aisles and passageways kept clear with no obstructions across or in aisles that could create a hazard and appropriately marked? 29 CFR 1910.22"
-  },
-  {
-    "ID": "23",
-    "Category": "LOTO",
-    "Short Issue": "Machine safety / LO/TO observed?",
-    "Issue": "Is any type of machine safety / lockout-tagout exposure observed in the facility at the time of the evaluation?"
-  },
-  {
-    "ID": "24",
-    "Category": "LOTO",
-    "Short Issue": "Bench grinders properly guarded",
-    "Issue": "Are bench grinders guarded and compliant with OSHA standards [ work rest - 1/8-inch; adjustable tongue guard - 1/4-inch ]? 29 CFR 1910.215"
-  },
-  {
-    "ID": "25",
-    "Category": "LOTO",
-    "Short Issue": "Lockout/tagout performed correctly",
-    "Issue": "LO/TO is performed correctly / using correct LO/TO equipment? 29 CFR 1910.147"
-  },
-  {
-    "ID": "26",
-    "Category": "LOTO",
-    "Short Issue": "Written procedures and inspections for LO/TO",
-    "Issue": "There is a LO/TO program that includes a written program, machine-specific procedures, and periodic inspections? 29 CFR 1910.147"
-  },
-  {
-    "ID": "27",
-    "Category": "LOTO",
-    "Short Issue": "Machine guarding in place",
-    "Issue": "Rotating or moving parts of equipment, chains, and gears properly guarded to prevent physical contact? Are all point-of-operation exposures properly guarded/protected? 29 CFR 1910.212, 1910.219"
-  },
-  {
-    "ID": "28",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "Forklifts use observed?",
-    "Issue": "Is any type of powered industrial truck / material handling exposure observed in the facility at the time of the evaluation?"
-  },
-  {
-    "ID": "29",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "Forklifts operated safely",
-    "Issue": "Powered industrial truck(s) were operated in a safe manner (i.e. seat belt, safe speed, clear view, etc.) at time of evaluation? 29 CFR 1910.178"
-  },
-  {
-    "ID": "30",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "Wheel chocks used when unloading",
-    "Issue": "Wheel chocks are available and/or in use to prevent the trucks from rolling while they are boarded with powered industrial trucks? 29 CFR 1910.178"
-  },
-  {
-    "ID": "31",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "Containers stored securely",
-    "Issue": "Containers are stored, stacked, blocked, and limited in height so they are stable and secure? 29 CFR 1910.176"
-  },
-  {
-    "ID": "32",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "PIT inspected before each shift",
-    "Issue": "Powered industrial trucks are inspected before each shift to ensure they are in proper working service? 29 CFR 1910.178"
-  },
-  {
-    "ID": "33",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "PIT operators trained/certified",
-    "Issue": "Have all authorized powered industrial truck drivers been trained and certified (machine-specific) within in the past 3 years? 29 CFR 1910.178"
-  },
-  {
-    "ID": "34",
-    "Category": "Material Handling / Powered Industrial Trucks (Forklifts)",
-    "Short Issue": "Spill kits/extinguishers for batteries",
-    "Issue": "Spill kits/fire extinguishers are available in the event of spilled electrolyte (battery-operated trucks)? 29 CFR 1910.175"
-  },
-  {
-    "ID": "35",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "MEWPs observed or in use?",
-    "Issue": "Were any type of MEWPs observed and/or in use at the time of the evaluation?"
-  },
-  {
-    "ID": "36",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Annual MEWP inspection within timeframe",
-    "Issue": "An annual inspection is performed no later than thirteen (13) months from the date of the prior annual inspection? ANSI A92.22"
-  },
-  {
-    "ID": "37",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Safe operation of MEWPs",
-    "Issue": "MEWPs were operated in a safe manner (i.e. fall protection, on floor of basket, safe path of travel, proper clearances, etc.) at time of evaluation?"
-  },
-  {
-    "ID": "38",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Proper training on MEWPs",
-    "Issue": "Have all authorized operators and occupants been properly trained? 29 CFR 1926.454"
-  },
-  {
-    "ID": "39",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Guardrails in place and in good condition",
-    "Issue": "All guardrails are in place and appear in good condition, including basket chains and gate door?"
-  },
-  {
-    "ID": "40",
-    "Category": "Mobile Elevated Work Platforms (MEWPs): Scissor Lift / Boom (Aerial) Lift",
-    "Short Issue": "Fall protection available & functional",
-    "Issue": "Fall protection was available for the boom/aerial lift and appeared in good condition?"
-  },
-  {
-    "ID": "41",
-    "Category": "Posting",
-    "Short Issue": "OSHA 'It's the Law' poster visible",
-    "Issue": "The 'OSHA Job Safety and Health: It's the Law' (Form 3165) is posted in a conspicuous place where workers can see it? 29 CFR 1903.2 https://www.osha.gov/Publications/poster.html"
-  },
-  {
-    "ID": "42",
-    "Category": "PPE",
-    "Short Issue": "PPE hazard assessment completed",
-    "Issue": "A PPE hazard assessment has been completed to determine if hazards are present, or are likely to be present, which necessitate the use of PPE? 29 CFR 1910.132"
-  },
-  {
-    "ID": "43",
-    "Category": "PPE",
-    "Short Issue": "Eye/face PPE provided & used",
-    "Issue": "Appropriate eye and face protection is provided, in good condition, and utilized upon exposure? 29 CFR 1910.133"
-  },
-  {
-    "ID": "44",
-    "Category": "PPE",
-    "Short Issue": "Hand protection provided & used",
-    "Issue": "Appropriate hand protection is provided, in good condition, and utilized upon exposure? 29 CFR 1910.138"
-  },
-  {
-    "ID": "45",
-    "Category": "PPE",
-    "Short Issue": "Foot protection provided & used",
-    "Issue": "Appropriate foot protection is provided, in good condition, and utilized upon exposure? 29 CFR 1910.136"
-  },
-  {
-    "ID": "46",
-    "Category": "PPE",
-    "Short Issue": "PPE training completed",
-    "Issue": "Employees have been trained in the PPE that is provided and worn? 29 CFR 1910.132"
-  },
-  {
-    "ID": "47",
-    "Category": "PPE",
-    "Short Issue": "Work on live electrical equipment?",
-    "Issue": "Do any employees open live electrical cabinets, or do any type of maintenance or trouble shooting work on machinery that is in the live condition?"
-  },
-  {
-    "ID": "48",
-    "Category": "Tools & Equipment",
-    "Short Issue": "Tools or equipment observed or in use?",
-    "Issue": "Were any type of tools or equipment observed to be in use at the time of the evaluation?"
-  },
-  {
-    "ID": "49",
-    "Category": "Tools & Equipment",
-    "Short Issue": "Hand tools in safe condition",
-    "Issue": "Hand tools appear to be in safe condition with guards in place? 29 CFR 1910.242"
-  },
-  {
-    "ID": "50",
-    "Category": "Walking-Working Surfaces/Fall Protection",
-    "Short Issue": "Fall protection for heights over 4 feet",
-    "Issue": "Personnel are protected (guardrails, personal fall arrest equipment) from any fall hazards over 4 feet? 29 CFR 1910.23"
-  },
-  {
-    "ID": "51",
-    "Category": "Walking-Working Surfaces/Fall Protection",
-    "Short Issue": "Self-closing gates at ladder openings",
-    "Issue": "Self-closing gates are used at fixed ladder opening and other similar openings? 29 CFR 1910.28"
-  },
-  {
-    "ID": "52",
-    "Category": "Walking-Working Surfaces/Fall Protection",
-    "Short Issue": "Stairs/changes in elevation adequate",
-    "Issue": "Stairs/changes in elevation appear adequate? 29 CFR 1910.25"
-  },
-  {
-    "ID": "53",
-    "Category": "Walking-Working Surfaces/Fall Protection",
-    "Short Issue": "Fixed ladder safety devices (24 ft+)",
-    "Issue": "Fixed ladders 24 feet high or more installed before Nov.19, 2018 have a ladder cage or ladder safety device? 29 CFR 1910.2"
-  },
-  {
-    "ID": "54",
-    "Category": "Walking-Working Surfaces/Fall Protection",
-    "Short Issue": "Dockboards prevent vehicle run-off",
-    "Issue": "Dockboards put into initial service on or after January 17, 2017 are designed, constructed, and maintained to prevent transfer vehicles from running off the dockboard edge? 29 CFR 1910.26"
+/**
+ * CONFIG
+ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznXNi6HRD8qpn3whwdxsj9X0dq7xdii-Gn7pPqzsNvnGoJQ1G5ephp1yhUlnqd-qW1/exec";
+const STORAGE_KEY = "osha_inspection_app_v3_sheet_driven";
+
+/**
+ * DOM
+ */
+const filtersContainer = document.getElementById("filters");
+const issueListEl = document.getElementById("issueList");
+
+const detailBackdrop = document.getElementById("detailBackdrop");
+const detailShortIssue = document.getElementById("detailShortIssue");
+const detailCategory = document.getElementById("detailCategory");
+const detailFullIssue = document.getElementById("detailFullIssue");
+
+const btnCompliant = document.getElementById("btnCompliant");
+const btnNeedsAttention = document.getElementById("btnNeedsAttention");
+const btnNA = document.getElementById("btnNA");
+
+const photoInput = document.getElementById("photoInput");
+const photoPreviewContainer = document.getElementById("photoPreviewContainer");
+const commentInput = document.getElementById("commentInput");
+const btnCancel = document.getElementById("btnCancel");
+const btnSave = document.getElementById("btnSave");
+
+const inspectorNameInput = document.getElementById("inspectorName");
+const inspectorEmailInput = document.getElementById("inspectorEmail");
+const areaSelect = document.getElementById("areaSelect");
+const submitBtn = document.getElementById("submitBtn");
+
+/**
+ * STATE
+ */
+let QUESTION_BANK = [];
+let AREAS = [];
+let issues = [];
+let currentFilter = "All";
+let currentIssueId = null;
+
+let tempStatus = null;
+let tempPhotos = [];
+let tempComments = "";
+
+/**
+ * HELPERS
+ */
+function safeTrim(v) { return String(v ?? "").trim(); }
+function isTrue(v) { return String(v ?? "").toUpperCase() === "TRUE"; }
+
+function statusToSymbol(s) {
+  if (s === "compliant") return "✔";
+  if (s === "needs_attention") return "✖";
+  if (s === "na") return "➖";
+  return "•";
+}
+function statusToClass(s) {
+  if (s === "compliant") return "status-compliant";
+  if (s === "needs_attention") return "status-needs_attention";
+  if (s === "na") return "status-na";
+  return "";
+}
+
+async function apiGet(action) {
+  const res = await fetch(`${SCRIPT_URL}?action=${encodeURIComponent(action)}`);
+  const data = await res.json();
+  if (!data || data.result !== "success") {
+    throw new Error(`API ${action} failed`);
   }
-];
-/* 2) Normalize data shape */
-const initialIssues = rawIssues.map(r => ({
-  id: Number(r.ID),
-  category: r.Category,
-  shortIssue: r["Short Issue"],
-  fullIssue: r.Issue,
-  status: null,
-  photos: [],      // array of base64 image data
-  comments: ""     // text field
-}));
+  return data.rows || [];
+}
 
-/* 3) Storage + state */
-const STORAGE_KEY = "osha_inspection_app_v2";
+/**
+ * SHEET-DRIVEN LOADING
+ */
+function normalizeQuestionRow(row) {
+  // Expecting headers from Question_Bank:
+  // ID, Category, ShortIssue, FullIssue, Area_Tags, Active, Requires_Photo, Requires_Comment, Followup_Group, Order
+  const id = safeTrim(row.ID);
+  return {
+    id: Number(id),
+    category: safeTrim(row.Category),
+    shortIssue: safeTrim(row.ShortIssue),
+    fullIssue: safeTrim(row.FullIssue),
+    active: isTrue(row.Active),
+    order: Number(row.Order || 9999),
+    // we store these for future enhancements; not enforced yet
+    requiresPhoto: isTrue(row.Requires_Photo),
+    requiresComment: isTrue(row.Requires_Comment),
+    areaTags: safeTrim(row.Area_Tags || "ALL"),
+    followupGroup: safeTrim(row.Followup_Group || "")
+  };
+}
 
-function loadIssues() {
+function loadSavedMap() {
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return initialIssues;
+  if (!saved) return new Map();
   try {
     const parsed = JSON.parse(saved);
-    return initialIssues.map(base => parsed.find(p => p.id === base.id) || base);
+    return new Map(parsed.map(x => [Number(x.id), x]));
   } catch {
-    return initialIssues;
+    return new Map();
   }
 }
+
 function saveIssues() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
 }
 
-let issues = loadIssues();
-let currentFilter = "All";
-let currentIssueId = null;
+function applyAreaFilterToQuestions(qs, selectedArea) {
+  // For now we keep it simple: show ALL, or show those tagged with selected area (if you start using tags)
+  // If Area_Tags is blank, treat as ALL.
+  const areaId = safeTrim(selectedArea || "ALL");
+  return qs.filter(q => {
+    const tags = safeTrim(q.areaTags || "ALL").split(",").map(t => t.trim());
+    return tags.includes("ALL") || tags.includes(areaId);
+  });
+}
 
-/* 4) Filters */
-const filtersContainer = document.getElementById("filters");
+function rebuildIssuesFromSheet() {
+  const savedMap = loadSavedMap();
+  const selectedArea = areaSelect.value || "ALL";
+
+  const activeQs = applyAreaFilterToQuestions(
+    QUESTION_BANK.filter(q => q.active),
+    selectedArea
+  ).sort((a,b) => a.order - b.order);
+
+  issues = activeQs.map(q => {
+    const prior = savedMap.get(q.id);
+    return {
+      id: q.id,
+      category: q.category,
+      shortIssue: q.shortIssue,
+      fullIssue: q.fullIssue,
+      status: prior?.status ?? null,
+      photos: Array.isArray(prior?.photos) ? prior.photos : [],
+      comments: prior?.comments ?? ""
+    };
+  });
+
+  saveIssues();
+  currentFilter = "All";
+  renderFilters();
+  renderIssueList();
+}
+
+async function loadConfig() {
+  // Areas
+  AREAS = await apiGet("areas");
+  const activeAreas = AREAS
+    .filter(a => String(a.Active ?? a.active ?? "").toUpperCase() === "TRUE")
+    .sort((a,b) => Number(a.Order || 9999) - Number(b.Order || 9999));
+
+  areaSelect.innerHTML = activeAreas.map(a => {
+    const id = safeTrim(a.Area_ID || a.area_id || "");
+    const name = safeTrim(a.Area_Name || a.area_name || id);
+    return `<option value="${id}">${name}</option>`;
+  }).join("");
+
+  // Default to ALL if present
+  const hasAll = activeAreas.some(a => safeTrim(a.Area_ID || "") === "ALL");
+  areaSelect.value = hasAll ? "ALL" : (activeAreas[0] ? safeTrim(activeAreas[0].Area_ID) : "ALL");
+
+  areaSelect.addEventListener("change", () => {
+    // On area change we rebuild (keeps saved statuses where IDs overlap)
+    rebuildIssuesFromSheet();
+  });
+
+  // Questions
+  const qbRows = await apiGet("questions");
+  QUESTION_BANK = qbRows.map(normalizeQuestionRow);
+
+  rebuildIssuesFromSheet();
+}
+
+/**
+ * FILTER CHIPS
+ */
 function getCategories() {
   return ["All", ...new Set(issues.map(i => i.category))];
 }
@@ -701,20 +535,9 @@ function renderFilters() {
   });
 }
 
-/* 5) List rendering */
-const issueListEl = document.getElementById("issueList");
-function statusToSymbol(s) {
-  if (s === "compliant") return "✔";
-  if (s === "needs_attention") return "✖";
-  if (s === "na") return "➖";
-  return "•";
-}
-function statusToClass(s) {
-  if (s === "compliant") return "status-compliant";
-  if (s === "needs_attention") return "status-needs_attention";
-  if (s === "na") return "status-na";
-  return "";
-}
+/**
+ * LIST RENDERING
+ */
 function renderIssueList() {
   issueListEl.innerHTML = "";
   const filtered = currentFilter === "All"
@@ -750,23 +573,24 @@ function renderIssueList() {
   });
 }
 
-/* 6) Detail modal (status, photos, comments) */
-const detailBackdrop = document.getElementById("detailBackdrop");
-const detailShortIssue = document.getElementById("detailShortIssue");
-const detailCategory = document.getElementById("detailCategory");
-const detailFullIssue = document.getElementById("detailFullIssue");
-const btnCompliant = document.getElementById("btnCompliant");
-const btnNeedsAttention = document.getElementById("btnNeedsAttention");
-const btnNA = document.getElementById("btnNA");
-const photoInput = document.getElementById("photoInput");
-const photoPreviewContainer = document.getElementById("photoPreviewContainer");
-const commentInput = document.getElementById("commentInput");
-const btnCancel = document.getElementById("btnCancel");
-const btnSave = document.getElementById("btnSave");
-
-let tempStatus = null;
-let tempPhotos = [];
-let tempComments = "";
+/**
+ * DETAIL MODAL
+ */
+function setStatusButtons(s) {
+  [btnCompliant, btnNeedsAttention, btnNA].forEach(b => b.classList.remove("active"));
+  if (s === "compliant") btnCompliant.classList.add("active");
+  if (s === "needs_attention") btnNeedsAttention.classList.add("active");
+  if (s === "na") btnNA.classList.add("active");
+}
+function renderPhotoPreviews() {
+  photoPreviewContainer.innerHTML = "";
+  tempPhotos.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "photo-thumb";
+    photoPreviewContainer.appendChild(img);
+  });
+}
 
 function openDetail(id) {
   currentIssueId = id;
@@ -792,27 +616,12 @@ function closeDetail() {
   detailBackdrop.classList.remove("open");
   currentIssueId = null;
 }
+
 btnCancel.onclick = closeDetail;
 
-function setStatusButtons(s) {
-  [btnCompliant, btnNeedsAttention, btnNA].forEach(b => b.classList.remove("active"));
-  if (s === "compliant") btnCompliant.classList.add("active");
-  if (s === "needs_attention") btnNeedsAttention.classList.add("active");
-  if (s === "na") btnNA.classList.add("active");
-}
 btnCompliant.onclick = () => { tempStatus = "compliant"; setStatusButtons(tempStatus); };
 btnNeedsAttention.onclick = () => { tempStatus = "needs_attention"; setStatusButtons(tempStatus); };
 btnNA.onclick = () => { tempStatus = "na"; setStatusButtons(tempStatus); };
-
-function renderPhotoPreviews() {
-  photoPreviewContainer.innerHTML = "";
-  tempPhotos.forEach(src => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.className = "photo-thumb";
-    photoPreviewContainer.appendChild(img);
-  });
-}
 
 photoInput.onchange = e => {
   const files = Array.from(e.target.files || []);
@@ -835,9 +644,11 @@ commentInput.oninput = e => {
 btnSave.onclick = () => {
   const idx = issues.findIndex(i => i.id === currentIssueId);
   if (idx === -1) return;
+
   issues[idx].status = tempStatus;
   issues[idx].photos = tempPhotos;
   issues[idx].comments = tempComments;
+
   saveIssues();
   renderIssueList();
   closeDetail();
@@ -847,19 +658,20 @@ detailBackdrop.onclick = e => {
   if (e.target === detailBackdrop) closeDetail();
 };
 
-/* 7) Submit to Google Sheet (with inspector info) */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznXNi6HRD8qpn3whwdxsj9X0dq7xdii-Gn7pPqzsNvnGoJQ1G5ephp1yhUlnqd-qW1/exec";
-
-const inspectorNameInput = document.getElementById("inspectorName");
-const inspectorEmailInput = document.getElementById("inspectorEmail");
-const submitBtn = document.getElementById("submitBtn");
-
+/**
+ * SUBMIT TO GOOGLE SHEET
+ */
 async function submitInspection() {
   const name = inspectorNameInput.value.trim();
   const email = inspectorEmailInput.value.trim();
+  const areaId = (areaSelect.value || "").trim();
 
   if (!name || !email) {
     alert("Please enter your name and email before submitting.");
+    return;
+  }
+  if (!areaId) {
+    alert("Please select an area before submitting.");
     return;
   }
 
@@ -869,10 +681,20 @@ async function submitInspection() {
     return;
   }
 
+  // Send only fields the backend expects
   const payload = {
     inspectorName: name,
     inspectorEmail: email,
-    items: itemsToSend
+    areaId: areaId, // ✅ NEW
+    items: itemsToSend.map(i => ({
+      id: i.id,
+      category: i.category,
+      shortIssue: i.shortIssue,
+      fullIssue: i.fullIssue,
+      status: i.status,
+      photos: i.photos || [],
+      comments: i.comments || ""
+    }))
   };
 
   submitBtn.disabled = true;
@@ -881,7 +703,7 @@ async function submitInspection() {
   try {
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
-      body: JSON.stringify(payload)   // no custom headers → avoids CORS drama
+      body: JSON.stringify(payload)
     });
 
     const text = await res.text();
@@ -902,8 +724,6 @@ async function submitInspection() {
       );
     }
 
-    console.log("Rows appended:", data.rowsAppended);
-
     alert("Inspection submitted! Starting a new blank inspection...");
 
     // Reset issues
@@ -913,11 +733,11 @@ async function submitInspection() {
       i.comments = "";
     });
 
-    // Reset inspector fields
+    // Reset inspector fields (keep area selected by default; comment out if you want it cleared)
     inspectorNameInput.value = "";
     inspectorEmailInput.value = "";
+    // areaSelect.value = "ALL";
 
-    // Persist reset + refresh UI
     saveIssues();
     currentFilter = "All";
     renderFilters();
@@ -933,9 +753,13 @@ async function submitInspection() {
 }
 submitBtn.onclick = submitInspection;
 
-/* 8) Initial render */
-renderFilters();
-renderIssueList();
+/**
+ * INIT
+ */
+loadConfig().catch(err => {
+  console.error(err);
+  alert("Failed to load checklist from Google Sheet. Check console for details.");
+});
 </script>
 </body>
 </html>
