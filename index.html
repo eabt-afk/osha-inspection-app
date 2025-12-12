@@ -423,14 +423,7 @@
     function isTrue(v){ return String(v ?? "").toUpperCase() === "TRUE"; }
 
     // Convert any legacy trigger/status values into yes/no/na
-    function normalizeStatus(v){
-      const s = String(v || "").toLowerCase().trim();
-      if (s === "needs_attention") return "no";
-      if (s === "compliant") return "yes";
-      if (s === "na") return "na";
-      if (s === "n/a") return "na";
-      return s; // yes/no/na
-    }
+
 
     function setStage(which){
       if (which === "setup") {
