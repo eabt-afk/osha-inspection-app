@@ -341,6 +341,7 @@
       <div class="footer-actions">
         <button class="btn btn-secondary" id="backBtn" type="button">Back</button>
         <button class="btn btn-secondary" id="nextBtn" type="button">Next</button>
+        <button class="btn btn-secondary" id="testSubmitBtn" type="button">Submit test</button>
         <button class="btn btn-primary" id="submitBtn" type="button">Submit</button>
         <button class="btn btn-danger" id="resetBtn" type="button">Reset</button>
       </div>
@@ -357,6 +358,7 @@
     /********************
      * DOM
      ********************/
+    const testSubmitBtn = document.getElementById("testSubmitBtn");
     const stageSetup = document.getElementById("stageSetup");
     const stageWizard = document.getElementById("stageWizard");
     const footer = document.getElementById("footer");
@@ -629,6 +631,7 @@
       const allDone = (visibleCount > 0 && answeredCount === visibleCount);
       submitBtn.classList.toggle("hidden", !allDone);
       if (visibleCount === 0) submitBtn.classList.add("hidden");
+      testSubmitBtn.classList.remove("hidden");
     }
 
     function setStatusButtons(status){
@@ -826,80 +829,106 @@
       renderQuestion();
     });
 
-    async function submitInspection(){
-      const name = safeTrim(session.inspectorName);
-      const email = safeTrim(session.inspectorEmail);
-      const areaId = safeTrim(session.areaId);
+   async function submitInspection(force = false){
+  const name = safeTrim(session.inspectorName);
+  const email = safeTrim(session.inspectorEmail);
+  const areaId = safeTrim(session.areaId);
 
-      if (!name || !email || !areaId) {
-        alert("Missing inspector info or area. Please restart.");
-        hardReset();
-        return;
-      }
-
-      const items = questions
-        .filter(q => q && !isHiddenByLogic(q))
-        .map(q => {
-          const a = answers.get(q.id) || {};
-          return {
-            id: q.id,
-            category: q.category,
-            shortIssue: q.shortIssue,
-            fullIssue: q.fullIssue,
-            status: a.status || "",
-            photos: a.photos || [],
-            comments: a.comments || ""
-          };
-        })
-        .filter(x => x.status);
-
-      if (!items.length) {
-        alert("No answered items to submit yet.");
-        return;
-      }
-
-      const payload = {
-        inspectorName: name,
-        inspectorEmail: email,
-        areaId: areaId,
-        items
-      };
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitting...";
-
-     try {
-  const res = await fetch(SCRIPT_URL, {
-    method: "POST",
-    body: JSON.stringify(payload)
-  });
-
-  const text = await res.text();
-  console.log("Apps Script raw response:", text);
-
-  let data = null;
-  try { data = JSON.parse(text); } catch {}
-
-  if (!res.ok || !data || data.result !== "success") {
-    const msg =
-      (data && data.message) ? data.message :
-      `Non-JSON or unexpected response (HTTP ${res.status}). Raw: ${text.slice(0, 500)}`;
-    throw new Error(msg);
+  if (!name || !email || !areaId) {
+    alert("Missing inspector info or area. Please restart.");
+    hardReset();
+    return;
   }
 
-  alert("Submitted! Starting a new blank inspection.");
-  localStorage.removeItem(STORAGE_KEY);
-  location.reload();
+  // If force=false (normal submit): only allow when all visible are answered
+  // If force=true (test submit): submit whatever has been answered so far
+  const visibleQs = questions.filter(q => q && !isHiddenByLogic(q));
+  const answeredQs = visibleQs.filter(q => {
+    const a = answers.get(q.id);
+    return a && a.status;
+  });
 
-} catch (err) {
-  console.error("Submit failed:", err);
-  alert("Error submitting inspection:\n\n" + (err && err.message ? err.message : err));
-} finally {
-  submitBtn.disabled = false;
-  submitBtn.textContent = "Submit";
+  if (!force) {
+    if (visibleQs.length === 0) {
+      alert("No questions to submit.");
+      return;
+    }
+    if (answeredQs.length !== visibleQs.length) {
+      alert("Please answer all visible questions before submitting.");
+      return;
+    }
+  } else {
+    if (answeredQs.length === 0) {
+      alert("No answered items to submit yet. Answer at least one question.");
+      return;
+    }
+  }
+
+  const items = answeredQs.map(q => {
+    const a = answers.get(q.id) || {};
+    return {
+      id: q.id,
+      category: q.category,
+      shortIssue: q.shortIssue,
+      fullIssue: q.fullIssue,
+      status: a.status || "",
+      photos: a.photos || [],
+      comments: a.comments || ""
+    };
+  });
+
+  const payload = {
+    inspectorName: name,
+    inspectorEmail: email,
+    areaId: areaId,
+    items
+  };
+
+  submitBtn.disabled = true;
+  testSubmitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+  testSubmitBtn.textContent = "Submitting...";
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    const text = await res.text();
+    console.log("Apps Script raw:", text);
+
+    let data;
+    try { data = JSON.parse(text); } catch { throw new Error("Apps Script did not return JSON"); }
+
+    if (!res.ok || !data || data.result !== "success") {
+      throw new Error((data && data.message) ? data.message : "Unknown submit error");
+    }
+
+    alert(force ? "Test submit succeeded!" : "Submitted! Starting a new blank inspection.");
+
+    // For test submits, you might want to keep answers; for now we keep everything as-is.
+    // If you want test submit to NOT clear anything, leave this block empty.
+    if (!force) {
+      localStorage.removeItem(STORAGE_KEY);
+      answers = new Map();
+      hiddenGroups = new Set();
+      idx = 0;
+      setStage("setup");
+    }
+
+  } catch (err) {
+    console.error("Submit failed:", err);
+    alert("Error submitting inspection. Check console for details.");
+  } finally {
+    submitBtn.disabled = false;
+    testSubmitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+    testSubmitBtn.textContent = "Submit test";
+  }
 }
-
-    submitBtn.addEventListener("click", submitInspection);
+    submitBtn.addEventListener("click", () => submitInspection(false));
+    testSubmitBtn.addEventListener("click", () => submitInspection(true));
 
     /********************
      * INIT
