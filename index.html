@@ -724,24 +724,26 @@
       });
     }
 
-    function setAnswerStatus(status){
-      const q = currentQuestion();
-      if (!q) return;
+function setAnswerStatus(status){
+  const q = currentQuestion();
+  if (!q) return;
 
-      const normalized = normalizeStatus(status);
+  const normalized = normalizeStatus(status);
 
-      const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
-      answers.set(q.id, { ...existing, status: normalized });
+  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+  answers.set(q.id, { ...existing, status: normalized });
 
-      setStatusButtons(normalized);
+  setStatusButtons(normalized);
 
-      applyRulesForAnswer(q.id, normalized);
+  // Apply logic rules (show/hide follow-ups)
+  applyRulesForAnswer(q.id, normalized);
 
-      updateFooter();
-      saveState();
+  updateFooter();
+  saveState();
 
-      advanceAfterAnswer();
-    }
+  // 🚫 NO auto-advance anymore
+}
+
 
     /********************
      * EVENTS
