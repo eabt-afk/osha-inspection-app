@@ -192,6 +192,44 @@
       background: #fff;
     }
 
+    /* NEW: Area flags UI */
+    .area-flags {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      background: #f9fafb;
+    }
+
+    .area-flags-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.6rem;
+    }
+
+    .area-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.4rem 0.8rem;
+    }
+
+    .area-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #111827;
+      user-select: none;
+    }
+
+    .area-item input[type="checkbox"]{
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border-radius: 4px;
+    }
+
     .footer {
       border-top: 1px solid #eee;
       background: #fff;
@@ -236,6 +274,7 @@
       .stage { padding: 0.85rem; }
       .status-btn { min-width: 0; }
       .field { min-width: 140px; }
+      .area-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -244,10 +283,10 @@
   <div class="app-shell">
     <header>
       <h1>OSHA Self-Inspection</h1>
-      <small>Select an area → answer one question at a time → submit.</small>
+      <small>Answer one question at a time → flag affected areas when “No” → submit.</small>
     </header>
 
-    <!-- STAGE 1: SETUP -->
+    <!-- STAGE 1: SETUP (NO AREA SELECT ANYMORE) -->
     <section class="stage active" id="stageSetup">
       <div class="card">
         <div class="topline">
@@ -256,16 +295,7 @@
             <div style="height:6px"></div>
             <div style="font-size:1.05rem;font-weight:800;">Start an inspection</div>
             <div style="height:6px"></div>
-            <div class="muted">Pick the area you’re inspecting and enter your info. Then we’ll load only the relevant questions.</div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="areaSelect">Area</label>
-            <select id="areaSelect">
-              <option value="">Loading areas…</option>
-            </select>
+            <div class="muted">Enter your info. You’ll answer the checklist once, and when you flag an issue (“No”), you’ll choose which areas it applies to.</div>
           </div>
         </div>
 
@@ -312,6 +342,19 @@
           </div>
         </div>
 
+        <!-- NEW: area flags (shown only when Status = No) -->
+        <div id="areaFlagsWrap" class="area-flags hidden">
+          <label>Areas affected (select all that apply)</label>
+
+          <div class="area-flags-actions">
+            <button class="btn btn-secondary" id="areasSelectAllBtn" type="button">Select all</button>
+            <button class="btn btn-secondary" id="areasClearBtn" type="button">Clear</button>
+          </div>
+
+          <div class="area-grid" id="areaFlags"></div>
+          <div class="muted" id="areasHint" style="margin-top:8px;"></div>
+        </div>
+
         <div class="row">
           <div class="field">
             <label for="commentInput">Comments / notes (optional)</label>
@@ -352,8 +395,8 @@
     /********************
      * CONFIG
      ********************/
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytD088dxUdCQFFW53df3uoK8Hy4KeVcrjPKm2uyJIZzvXhGdnSOBRgMzcDObYMA4wI/exec";
-    const STORAGE_KEY = "osha_inspection_wizard_v1";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWJb_yVlgjiLR1RiSciUL9H40Y_UolkN51GBpI7uQHUFV5JhAVAxcfQ75Q2fn7DzYi/exec";
+    const STORAGE_KEY = "osha_inspection_wizard_v2_area_flags";
 
     /********************
      * DOM
@@ -362,7 +405,6 @@
     const stageWizard = document.getElementById("stageWizard");
     const footer = document.getElementById("footer");
 
-    const areaSelect = document.getElementById("areaSelect");
     const inspectorNameInput = document.getElementById("inspectorName");
     const inspectorEmailInput = document.getElementById("inspectorEmail");
     const beginBtn = document.getElementById("beginBtn");
@@ -376,6 +418,12 @@
     const btnYes = document.getElementById("btnYes");
     const btnNo = document.getElementById("btnNo");
     const btnNA = document.getElementById("btnNA");
+
+    const areaFlagsWrap = document.getElementById("areaFlagsWrap");
+    const areaFlags = document.getElementById("areaFlags");
+    const areasHint = document.getElementById("areasHint");
+    const areasSelectAllBtn = document.getElementById("areasSelectAllBtn");
+    const areasClearBtn = document.getElementById("areasClearBtn");
 
     const commentInput = document.getElementById("commentInput");
     const photoInput = document.getElementById("photoInput");
@@ -404,8 +452,6 @@
     let idx = 0;
 
     let session = {
-      areaId: "",
-      areaName: "",
       inspectorName: "",
       inspectorEmail: ""
     };
@@ -416,7 +462,6 @@
     function safeTrim(v){ return String(v ?? "").trim(); }
     function isTrue(v){ return String(v ?? "").toUpperCase() === "TRUE"; }
 
-    // One normalizer used everywhere (logic + answers + submit)
     function normalizeStatus(v){
       const s = String(v ?? "").toLowerCase().trim();
       if (s === "y" || s === "yes") return "yes";
@@ -438,7 +483,6 @@
     }
 
     function apiGet(action){
-      // JSONP for GitHub Pages
       return new Promise((resolve, reject) => {
         const cb = "cb_" + action + "_" + Math.random().toString(36).slice(2);
         const script = document.createElement("script");
@@ -495,7 +539,7 @@
       answers = new Map();
       hiddenGroups = new Set();
       idx = 0;
-      session = { areaId:"", areaName:"", inspectorName:"", inspectorEmail:"" };
+      session = { inspectorName:"", inspectorEmail:"" };
       inspectorNameInput.value = "";
       inspectorEmailInput.value = "";
       setupHint.textContent = "";
@@ -571,7 +615,7 @@
     function updateFooter(){
       const { visibleCount, answeredCount } = countAnsweredVisible();
       progressText.innerHTML = `${answeredCount} / ${visibleCount} <small>answered</small>`;
-      areaText.textContent = `Area: ${session.areaName || session.areaId || "—"}`;
+      areaText.textContent = `Mode: Full checklist • Flag areas when “No”`;
 
       backBtn.disabled = (findNextIndex(idx, -1) === -1);
       nextBtn.disabled = (findNextIndex(idx, +1) === -1);
@@ -579,21 +623,83 @@
       const allDone = (visibleCount > 0 && answeredCount === visibleCount);
       submitBtn.classList.toggle("hidden", !allDone);
       if (visibleCount === 0) submitBtn.classList.add("hidden");
-
-      // keep test button always available once wizard starts
       testSubmitBtn.classList.remove("hidden");
     }
 
-    function advanceAfterAnswer(){
-      const next = findNextIndex(idx, +1);
-      if (next !== -1) {
-        idx = next;
-        renderQuestion();
+    /********************
+     * Area Flags UI
+     ********************/
+    function getFlaggedAreasForCurrent(){
+      const q = currentQuestion();
+      if (!q) return [];
+      const existing = answers.get(q.id) || {};
+      return Array.isArray(existing.flaggedAreas) ? existing.flaggedAreas : [];
+    }
+
+    function renderAreaFlags(selected = []){
+      areaFlags.innerHTML = "";
+
+      // exclude "ALL" from checkbox list (still allowed in sheet)
+      const list = AREAS.filter(a => a.id && a.id !== "ALL");
+
+      if (!list.length) {
+        areasHint.textContent = "No areas loaded.";
+        return;
+      }
+
+      list.forEach(a => {
+        const row = document.createElement("label");
+        row.className = "area-item";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = a.id;
+        cb.checked = selected.includes(a.id);
+        cb.addEventListener("change", saveAreaFlags);
+
+        const txt = document.createElement("span");
+        txt.textContent = a.name;
+
+        row.appendChild(cb);
+        row.appendChild(txt);
+        areaFlags.appendChild(row);
+      });
+
+      areasHint.textContent = "Tip: only required when you answer “No”.";
+    }
+
+    function saveAreaFlags(){
+      const q = currentQuestion();
+      if (!q) return;
+
+      const checked = [...areaFlags.querySelectorAll('input[type="checkbox"]:checked')]
+        .map(cb => cb.value);
+
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [], flaggedAreas: [] };
+      answers.set(q.id, { ...existing, flaggedAreas: checked });
+
+      saveState();
+      updateFooter();
+    }
+
+    function showOrHideAreaFlags(status){
+      if (status === "no") {
+        areaFlagsWrap.classList.remove("hidden");
+        renderAreaFlags(getFlaggedAreasForCurrent());
       } else {
-        updateFooter();
-        saveState();
+        areaFlagsWrap.classList.add("hidden");
       }
     }
+
+    areasSelectAllBtn.addEventListener("click", () => {
+      [...areaFlags.querySelectorAll('input[type="checkbox"]')].forEach(cb => cb.checked = true);
+      saveAreaFlags();
+    });
+
+    areasClearBtn.addEventListener("click", () => {
+      [...areaFlags.querySelectorAll('input[type="checkbox"]')].forEach(cb => cb.checked = false);
+      saveAreaFlags();
+    });
 
     /********************
      * NORMALIZE SHEET ROWS
@@ -614,7 +720,6 @@
         category: safeTrim(r.Category),
         shortIssue: safeTrim(r.ShortIssue),
         fullIssue: safeTrim(r.FullIssue),
-        areaTags: safeTrim(r.Area_Tags || "ALL"),
         active: isTrue(r.Active),
         followupGroup: safeTrim(r.Followup_Group || ""),
         order: Number(r.Order || 9999)
@@ -624,28 +729,18 @@
     function normalizeLogicRow(r){
       return {
         triggerId: Number(safeTrim(r.Trigger_Question_ID)),
-        triggerStatus: normalizeStatus(r.Trigger_Status), // yes/no/na
+        triggerStatus: normalizeStatus(r.Trigger_Status),
         affectedGroup: safeTrim(r.Affected_Group),
-        action: safeTrim(r.Action).toUpperCase()          // SHOW/HIDE
+        action: safeTrim(r.Action).toUpperCase()
       };
     }
 
     /********************
-     * BUILD QUESTIONS FOR AREA
+     * BUILD QUESTIONS (NO AREA FILTERING ANYMORE)
      ********************/
-    function questionAppliesToArea(q, areaId){
-      const tags = safeTrim(q.areaTags || "ALL")
-        .split(",")
-        .map(t => t.trim())
-        .filter(Boolean);
-      return tags.includes("ALL") || tags.includes(areaId);
-    }
-
-    function rebuildQuestionsForArea(){
-      const areaId = session.areaId;
+    function rebuildQuestions(){
       questions = QUESTION_BANK
         .filter(q => q.active)
-        .filter(q => questionAppliesToArea(q, areaId))
         .sort((a,b) => a.order - b.order);
 
       if (idx < 0) idx = 0;
@@ -658,7 +753,7 @@
     function renderQuestion(){
       const q = currentQuestion();
       if (!q) {
-        shortIssueEl.textContent = "No questions found for this area.";
+        shortIssueEl.textContent = "No questions found.";
         fullIssueEl.textContent = "";
         catPill.textContent = "—";
         idxPill.textContent = "0 / 0";
@@ -666,6 +761,7 @@
         setStatusButtons(null);
         commentInput.value = "";
         photoPreview.innerHTML = "";
+        areaFlagsWrap.classList.add("hidden");
         updateFooter();
         return;
       }
@@ -688,10 +784,12 @@
       const visiblePos = visibleQs.findIndex(x => x.id === q2.id) + 1;
       idxPill.textContent = `${visiblePos} / ${visibleQs.length}`;
 
-      const a = answers.get(q2.id) || { status: null, comments: "", photos: [] };
+      const a = answers.get(q2.id) || { status: null, comments: "", photos: [], flaggedAreas: [] };
       setStatusButtons(a.status || null);
       commentInput.value = a.comments || "";
       renderPhotoPreview(a.photos || []);
+
+      showOrHideAreaFlags(a.status || null);
 
       if (q2.followupGroup) {
         skipHint.textContent = `Logic group: ${q2.followupGroup} (${hiddenGroups.has(q2.followupGroup) ? "hidden" : "visible"})`;
@@ -724,26 +822,28 @@
       });
     }
 
-function setAnswerStatus(status){
-  const q = currentQuestion();
-  if (!q) return;
+    function setAnswerStatus(status){
+      const q = currentQuestion();
+      if (!q) return;
 
-  const normalized = normalizeStatus(status);
+      const normalized = normalizeStatus(status);
 
-  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
-  answers.set(q.id, { ...existing, status: normalized });
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [], flaggedAreas: [] };
 
-  setStatusButtons(normalized);
+      // if switching away from "no", wipe flaggedAreas
+      const nextFlaggedAreas = (normalized === "no") ? (existing.flaggedAreas || []) : [];
 
-  // Apply logic rules (show/hide follow-ups)
-  applyRulesForAnswer(q.id, normalized);
+      answers.set(q.id, { ...existing, status: normalized, flaggedAreas: nextFlaggedAreas });
 
-  updateFooter();
-  saveState();
+      setStatusButtons(normalized);
 
-  // 🚫 NO auto-advance anymore
-}
+      applyRulesForAnswer(q.id, normalized);
 
+      showOrHideAreaFlags(normalized);
+
+      updateFooter();
+      saveState();
+    }
 
     /********************
      * EVENTS
@@ -755,7 +855,7 @@ function setAnswerStatus(status){
     commentInput.addEventListener("input", () => {
       const q = currentQuestion();
       if (!q) return;
-      const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [], flaggedAreas: [] };
       answers.set(q.id, { ...existing, comments: commentInput.value });
       saveState();
     });
@@ -767,7 +867,7 @@ function setAnswerStatus(status){
       const files = Array.from(e.target.files || []);
       if (!files.length) return;
 
-      const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [], flaggedAreas: [] };
       const photos = Array.isArray(existing.photos) ? [...existing.photos] : [];
 
       let pending = files.length;
@@ -785,7 +885,6 @@ function setAnswerStatus(status){
         reader.readAsDataURL(file);
       });
 
-      // allow re-upload same file later
       photoInput.value = "";
     });
 
@@ -806,20 +905,15 @@ function setAnswerStatus(status){
     });
 
     beginBtn.addEventListener("click", () => {
-      const areaId = safeTrim(areaSelect.value);
       const name = safeTrim(inspectorNameInput.value);
       const email = safeTrim(inspectorEmailInput.value);
 
-      if (!areaId) { alert("Please select an area."); return; }
       if (!name || !email) { alert("Please enter your name and email."); return; }
 
-      const areaObj = AREAS.find(a => a.id === areaId);
-      session.areaId = areaId;
-      session.areaName = areaObj ? areaObj.name : areaId;
       session.inspectorName = name;
       session.inspectorEmail = email;
 
-      rebuildQuestionsForArea();
+      rebuildQuestions();
 
       idx = 0;
       const firstVisible = (questions[0] && isHiddenByLogic(questions[0])) ? findNextIndex(-1, +1) : 0;
@@ -832,10 +926,9 @@ function setAnswerStatus(status){
     async function submitInspection(force = false){
       const name = safeTrim(session.inspectorName);
       const email = safeTrim(session.inspectorEmail);
-      const areaId = safeTrim(session.areaId);
 
-      if (!name || !email || !areaId) {
-        alert("Missing inspector info or area. Please restart.");
+      if (!name || !email) {
+        alert("Missing inspector info. Please restart.");
         hardReset();
         return;
       }
@@ -859,6 +952,20 @@ function setAnswerStatus(status){
         }
       }
 
+      // Validation: if status=no, require at least one flagged area
+      for (const q of answeredQs) {
+        const a = answers.get(q.id) || {};
+        if (a.status === "no") {
+          const fa = Array.isArray(a.flaggedAreas) ? a.flaggedAreas : [];
+          if (!fa.length) {
+            alert(`Please select at least one area for the flagged issue:\n\n"${q.shortIssue}"`);
+            idx = questions.findIndex(x => x && x.id === q.id);
+            renderQuestion();
+            return;
+          }
+        }
+      }
+
       const items = answeredQs.map(q => {
         const a = answers.get(q.id) || {};
         return {
@@ -867,12 +974,13 @@ function setAnswerStatus(status){
           shortIssue: q.shortIssue,
           fullIssue: q.fullIssue,
           status: a.status || "",
+          flaggedAreas: a.flaggedAreas || [],
           photos: a.photos || [],
           comments: a.comments || ""
         };
       });
 
-      const payload = { inspectorName: name, inspectorEmail: email, areaId, items };
+      const payload = { inspectorName: name, inspectorEmail: email, items };
 
       submitBtn.disabled = true;
       testSubmitBtn.disabled = true;
@@ -932,22 +1040,17 @@ function setAnswerStatus(status){
       QUESTION_BANK = qRows.map(normalizeQuestionRow);
       LOGIC_RULES = logicRows.map(normalizeLogicRow);
 
-      areaSelect.innerHTML =
-        `<option value="">Select area…</option>` +
-        AREAS.map(a => `<option value="${a.id}">${a.name}</option>`).join("");
-
+      // Restore
       const restored = loadState();
       if (restored) {
         inspectorNameInput.value = session.inspectorName || "";
         inspectorEmailInput.value = session.inspectorEmail || "";
 
-        if (session.areaId) {
-          areaSelect.value = session.areaId;
-          rebuildQuestionsForArea();
-          setStage("wizard");
-          renderQuestion();
-          return;
-        }
+        rebuildQuestions();
+        setStage("wizard");
+        renderQuestion();
+        setupHint.textContent = "";
+        return;
       }
 
       setStage("setup");
