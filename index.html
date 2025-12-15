@@ -53,7 +53,7 @@
       display: flex;
       gap: 0.6rem;
       flex-wrap: wrap;
-      margin-top: 0.6rem; /* ✅ FIXED (was broken CSS) */
+      margin-top: 0.6rem;
     }
 
     label {
@@ -247,7 +247,7 @@
       <small>Select an area → answer one question at a time → submit.</small>
     </header>
 
-    <!-- STAGE 1: SETUP (Area + Inspector) -->
+    <!-- STAGE 1: SETUP -->
     <section class="stage active" id="stageSetup">
       <div class="card">
         <div class="topline">
@@ -289,7 +289,7 @@
       </div>
     </section>
 
-    <!-- STAGE 2: WIZARD QUESTION -->
+    <!-- STAGE 2: WIZARD -->
     <section class="stage" id="stageWizard">
       <div class="card">
         <div class="topline">
@@ -358,7 +358,6 @@
     /********************
      * DOM
      ********************/
-    const testSubmitBtn = document.getElementById("testSubmitBtn");
     const stageSetup = document.getElementById("stageSetup");
     const stageWizard = document.getElementById("stageWizard");
     const footer = document.getElementById("footer");
@@ -388,6 +387,7 @@
 
     const backBtn = document.getElementById("backBtn");
     const nextBtn = document.getElementById("nextBtn");
+    const testSubmitBtn = document.getElementById("testSubmitBtn");
     const submitBtn = document.getElementById("submitBtn");
     const resetBtn = document.getElementById("resetBtn");
 
@@ -411,36 +411,17 @@
     };
 
     /********************
-     * UTIL
+     * HELPERS
      ********************/
     function safeTrim(v){ return String(v ?? "").trim(); }
     function isTrue(v){ return String(v ?? "").toUpperCase() === "TRUE"; }
-    function clearAnswersForGroup(groupName) {
-  if (!groupName) return;
 
-  // Remove any saved answers for questions in this followup group
-  questions.forEach(q => {
-    if (!q) return;
-    if (q.followupGroup === groupName) {
-      answers.delete(q.id);
-    }
-  });
-
-  // If the current question is now hidden, jump to next visible
-  const cq = currentQuestion();
-  if (cq && isHiddenByLogic(cq)) {
-    const next = findNextIndex(idx, +1);
-    const prev = findNextIndex(idx, -1);
-    if (next !== -1) idx = next;
-    else if (prev !== -1) idx = prev;
-  }
-}
-
-    // ✅ Sheet-native status normalization:
-    // Accepts "yes", "no", "na" (also tolerates "n/a")
-    function normalizeSheetStatus(v){
+    // One normalizer used everywhere (logic + answers + submit)
+    function normalizeStatus(v){
       const s = String(v ?? "").toLowerCase().trim();
-      if (s === "n/a") return "na";
+      if (s === "y" || s === "yes") return "yes";
+      if (s === "n" || s === "no") return "no";
+      if (s === "n/a" || s === "na") return "na";
       return s;
     }
 
@@ -457,6 +438,7 @@
     }
 
     function apiGet(action){
+      // JSONP for GitHub Pages
       return new Promise((resolve, reject) => {
         const cb = "cb_" + action + "_" + Math.random().toString(36).slice(2);
         const script = document.createElement("script");
@@ -514,13 +496,104 @@
       hiddenGroups = new Set();
       idx = 0;
       session = { areaId:"", areaName:"", inspectorName:"", inspectorEmail:"" };
-
       inspectorNameInput.value = "";
       inspectorEmailInput.value = "";
       setupHint.textContent = "";
       setStage("setup");
     }
-    
+
+    function currentQuestion(){
+      return questions[idx] || null;
+    }
+
+    function isHiddenByLogic(q){
+      if (!q || !q.followupGroup) return false;
+      return hiddenGroups.has(q.followupGroup);
+    }
+
+    function findNextIndex(fromIdx, direction){
+      let i = fromIdx;
+      while (true) {
+        i += direction;
+        if (i < 0 || i >= questions.length) return -1;
+        const q = questions[i];
+        if (!q) continue;
+        if (isHiddenByLogic(q)) continue;
+        return i;
+      }
+    }
+
+    function renderPhotoPreview(photos){
+      photoPreview.innerHTML = "";
+      (photos || []).forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "photo-thumb";
+        photoPreview.appendChild(img);
+      });
+    }
+
+    function setStatusButtons(status){
+      [btnYes, btnNo, btnNA].forEach(b => b.classList.remove("active"));
+      if (status === "yes") btnYes.classList.add("active");
+      if (status === "no") btnNo.classList.add("active");
+      if (status === "na") btnNA.classList.add("active");
+    }
+
+    function clearAnswersForGroup(groupName){
+      if (!groupName) return;
+      questions.forEach(q => {
+        if (q && q.followupGroup === groupName) answers.delete(q.id);
+      });
+
+      const cq = currentQuestion();
+      if (cq && isHiddenByLogic(cq)) {
+        const next = findNextIndex(idx, +1);
+        const prev = findNextIndex(idx, -1);
+        if (next !== -1) idx = next;
+        else if (prev !== -1) idx = prev;
+      }
+    }
+
+    function countAnsweredVisible(){
+      let visibleCount = 0;
+      let answeredCount = 0;
+      questions.forEach(q => {
+        if (!q) return;
+        if (isHiddenByLogic(q)) return;
+        visibleCount++;
+        const a = answers.get(q.id);
+        if (a && a.status) answeredCount++;
+      });
+      return { visibleCount, answeredCount };
+    }
+
+    function updateFooter(){
+      const { visibleCount, answeredCount } = countAnsweredVisible();
+      progressText.innerHTML = `${answeredCount} / ${visibleCount} <small>answered</small>`;
+      areaText.textContent = `Area: ${session.areaName || session.areaId || "—"}`;
+
+      backBtn.disabled = (findNextIndex(idx, -1) === -1);
+      nextBtn.disabled = (findNextIndex(idx, +1) === -1);
+
+      const allDone = (visibleCount > 0 && answeredCount === visibleCount);
+      submitBtn.classList.toggle("hidden", !allDone);
+      if (visibleCount === 0) submitBtn.classList.add("hidden");
+
+      // keep test button always available once wizard starts
+      testSubmitBtn.classList.remove("hidden");
+    }
+
+    function advanceAfterAnswer(){
+      const next = findNextIndex(idx, +1);
+      if (next !== -1) {
+        idx = next;
+        renderQuestion();
+      } else {
+        updateFooter();
+        saveState();
+      }
+    }
 
     /********************
      * NORMALIZE SHEET ROWS
@@ -551,9 +624,9 @@
     function normalizeLogicRow(r){
       return {
         triggerId: Number(safeTrim(r.Trigger_Question_ID)),
-        triggerStatus: normalizeSheetStatus(r.Trigger_Status), // ✅ yes/no/na
+        triggerStatus: normalizeStatus(r.Trigger_Status), // yes/no/na
         affectedGroup: safeTrim(r.Affected_Group),
-        action: safeTrim(r.Action).toUpperCase()              // SHOW/HIDE
+        action: safeTrim(r.Action).toUpperCase()          // SHOW/HIDE
       };
     }
 
@@ -565,13 +638,11 @@
         .split(",")
         .map(t => t.trim())
         .filter(Boolean);
-
       return tags.includes("ALL") || tags.includes(areaId);
     }
 
     function rebuildQuestionsForArea(){
       const areaId = session.areaId;
-
       questions = QUESTION_BANK
         .filter(q => q.active)
         .filter(q => questionAppliesToArea(q, areaId))
@@ -582,75 +653,8 @@
     }
 
     /********************
-     * WIZARD NAV
+     * RENDER
      ********************/
-    function currentQuestion(){
-      return questions[idx] || null;
-    }
-
-    function isHiddenByLogic(q){
-      if (!q.followupGroup) return false;
-      return hiddenGroups.has(q.followupGroup);
-    }
-
-    function findNextIndex(fromIdx, direction){
-      let i = fromIdx;
-      while (true) {
-        i += direction;
-        if (i < 0 || i >= questions.length) return -1;
-        const q = questions[i];
-        if (!q) continue;
-        if (isHiddenByLogic(q)) continue;
-        return i;
-      }
-    }
-
-    function countAnsweredVisible(){
-      let visibleCount = 0;
-      let answeredCount = 0;
-
-      questions.forEach(q => {
-        if (!q) return;
-        if (isHiddenByLogic(q)) return;
-        visibleCount++;
-        const a = answers.get(q.id);
-        if (a && a.status) answeredCount++;
-      });
-
-      return { visibleCount, answeredCount };
-    }
-
-    function updateFooter(){
-      const { visibleCount, answeredCount } = countAnsweredVisible();
-      progressText.innerHTML = `${answeredCount} / ${visibleCount} <small>answered</small>`;
-      areaText.textContent = `Area: ${session.areaName || session.areaId || "—"}`;
-
-      backBtn.disabled = (findNextIndex(idx, -1) === -1);
-      nextBtn.disabled = (findNextIndex(idx, +1) === -1);
-
-      const allDone = (visibleCount > 0 && answeredCount === visibleCount);
-      submitBtn.classList.toggle("hidden", !allDone);
-      if (visibleCount === 0) submitBtn.classList.add("hidden");
-      testSubmitBtn.classList.remove("hidden");
-    }
-
-    function setStatusButtons(status){
-      [btnYes, btnNo, btnNA].forEach(b => b.classList.remove("active"));
-      if (status === "yes") btnYes.classList.add("active");
-      if (status === "no") btnNo.classList.add("active");
-      if (status === "na") btnNA.classList.add("active");
-    }
-
-    function renderPhotoPreview(photos){
-      photoPreview.innerHTML = "";
-      (photos || []).forEach(src => {
-        const img = document.createElement("img");
-        img.src = src;
-        img.className = "photo-thumb";
-        photoPreview.appendChild(img);
-      });
-    }
-
     function renderQuestion(){
       const q = currentQuestion();
       if (!q) {
@@ -699,59 +703,45 @@
       saveState();
     }
 
-   function applyRulesForAnswer(questionId, status){
-  const s = normalizeSheetStatus(status);
+    /********************
+     * LOGIC + ANSWERS
+     ********************/
+    function applyRulesForAnswer(questionId, status){
+      const s = normalizeStatus(status);
 
-  LOGIC_RULES.forEach(rule => {
-    if (rule.triggerId !== questionId) return;
-    if (rule.triggerStatus !== s) return;
+      LOGIC_RULES.forEach(rule => {
+        if (rule.triggerId !== questionId) return;
+        if (rule.triggerStatus !== s) return;
 
-    if (rule.action === "HIDE") {
-      hiddenGroups.add(rule.affectedGroup);
+        if (rule.action === "HIDE") {
+          hiddenGroups.add(rule.affectedGroup);
+          clearAnswersForGroup(rule.affectedGroup);
+        }
 
-      // ✅ NEW: wipe answers for that group so nothing stale can submit
-      clearAnswersForGroup(rule.affectedGroup);
+        if (rule.action === "SHOW") {
+          hiddenGroups.delete(rule.affectedGroup);
+        }
+      });
     }
 
-    if (rule.action === "SHOW") {
-      hiddenGroups.delete(rule.affectedGroup);
-      // (We do NOT restore old answers on SHOW — keeps it clean/intentional)
+    function setAnswerStatus(status){
+      const q = currentQuestion();
+      if (!q) return;
+
+      const normalized = normalizeStatus(status);
+
+      const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
+      answers.set(q.id, { ...existing, status: normalized });
+
+      setStatusButtons(normalized);
+
+      applyRulesForAnswer(q.id, normalized);
+
+      updateFooter();
+      saveState();
+
+      advanceAfterAnswer();
     }
-  });
-}
-
-function setAnswerStatus(status){
-  const q = currentQuestion();
-  if (!q) return;
-
-  const normalized = normalizeStatus(status);
-
-  const existing = answers.get(q.id) || { status: null, comments: "", photos: [] };
-  answers.set(q.id, { ...existing, status: normalized });
-
-  setStatusButtons(normalized);
-
-  // Apply logic rules
-  applyRulesForAnswer(q.id, normalized);
-
-  updateFooter();
-  saveState();
-
-  // ✅ ADD THIS:
-  advanceAfterAnswer();
-}
-function advanceAfterAnswer() {
-  // Auto-advance to the next visible question (if there is one)
-  const next = findNextIndex(idx, +1);
-  if (next !== -1) {
-    idx = next;
-    renderQuestion();
-  } else {
-    // no next question; just refresh footer/state
-    updateFooter();
-    saveState();
-  }
-}
 
     /********************
      * EVENTS
@@ -779,7 +769,6 @@ function advanceAfterAnswer() {
       const photos = Array.isArray(existing.photos) ? [...existing.photos] : [];
 
       let pending = files.length;
-
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = evt => {
@@ -794,23 +783,18 @@ function advanceAfterAnswer() {
         reader.readAsDataURL(file);
       });
 
+      // allow re-upload same file later
       photoInput.value = "";
     });
 
     backBtn.addEventListener("click", () => {
       const prev = findNextIndex(idx, -1);
-      if (prev !== -1) {
-        idx = prev;
-        renderQuestion();
-      }
+      if (prev !== -1) { idx = prev; renderQuestion(); }
     });
 
     nextBtn.addEventListener("click", () => {
       const next = findNextIndex(idx, +1);
-      if (next !== -1) {
-        idx = next;
-        renderQuestion();
-      }
+      if (next !== -1) { idx = next; renderQuestion(); }
     });
 
     resetBtn.addEventListener("click", () => {
@@ -843,104 +827,89 @@ function advanceAfterAnswer() {
       renderQuestion();
     });
 
-   async function submitInspection(force = false){
-  const name = safeTrim(session.inspectorName);
-  const email = safeTrim(session.inspectorEmail);
-  const areaId = safeTrim(session.areaId);
+    async function submitInspection(force = false){
+      const name = safeTrim(session.inspectorName);
+      const email = safeTrim(session.inspectorEmail);
+      const areaId = safeTrim(session.areaId);
 
-  if (!name || !email || !areaId) {
-    alert("Missing inspector info or area. Please restart.");
-    hardReset();
-    return;
-  }
+      if (!name || !email || !areaId) {
+        alert("Missing inspector info or area. Please restart.");
+        hardReset();
+        return;
+      }
 
-  // If force=false (normal submit): only allow when all visible are answered
-  // If force=true (test submit): submit whatever has been answered so far
-  const visibleQs = questions.filter(q => q && !isHiddenByLogic(q));
-  const answeredQs = visibleQs.filter(q => {
-    const a = answers.get(q.id);
-    return a && a.status;
-  });
+      const visibleQs = questions.filter(q => q && !isHiddenByLogic(q));
+      const answeredQs = visibleQs.filter(q => {
+        const a = answers.get(q.id);
+        return a && a.status;
+      });
 
-  if (!force) {
-    if (visibleQs.length === 0) {
-      alert("No questions to submit.");
-      return;
-    }
-    if (answeredQs.length !== visibleQs.length) {
-      alert("Please answer all visible questions before submitting.");
-      return;
-    }
-  } else {
-    if (answeredQs.length === 0) {
-      alert("No answered items to submit yet. Answer at least one question.");
-      return;
-    }
-  }
+      if (!force) {
+        if (visibleQs.length === 0) { alert("No questions to submit."); return; }
+        if (answeredQs.length !== visibleQs.length) {
+          alert("Please answer all visible questions before submitting.");
+          return;
+        }
+      } else {
+        if (answeredQs.length === 0) {
+          alert("No answered items to submit yet. Answer at least one question.");
+          return;
+        }
+      }
 
-  const items = answeredQs.map(q => {
-    const a = answers.get(q.id) || {};
-    return {
-      id: q.id,
-      category: q.category,
-      shortIssue: q.shortIssue,
-      fullIssue: q.fullIssue,
-      status: a.status || "",
-      photos: a.photos || [],
-      comments: a.comments || ""
-    };
-  });
+      const items = answeredQs.map(q => {
+        const a = answers.get(q.id) || {};
+        return {
+          id: q.id,
+          category: q.category,
+          shortIssue: q.shortIssue,
+          fullIssue: q.fullIssue,
+          status: a.status || "",
+          photos: a.photos || [],
+          comments: a.comments || ""
+        };
+      });
 
-  const payload = {
-    inspectorName: name,
-    inspectorEmail: email,
-    areaId: areaId,
-    items
-  };
+      const payload = { inspectorName: name, inspectorEmail: email, areaId, items };
 
-  submitBtn.disabled = true;
-  testSubmitBtn.disabled = true;
-  submitBtn.textContent = "Submitting...";
-  testSubmitBtn.textContent = "Submitting...";
+      submitBtn.disabled = true;
+      testSubmitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+      testSubmitBtn.textContent = "Submitting...";
 
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
+      try {
+        const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        const text = await res.text();
+        console.log("Apps Script raw:", text);
 
-    const text = await res.text();
-    console.log("Apps Script raw:", text);
+        let data;
+        try { data = JSON.parse(text); } catch { throw new Error("Apps Script did not return JSON"); }
 
-    let data;
-    try { data = JSON.parse(text); } catch { throw new Error("Apps Script did not return JSON"); }
+        if (!res.ok || !data || data.result !== "success") {
+          throw new Error((data && data.message) ? data.message : "Unknown submit error");
+        }
 
-    if (!res.ok || !data || data.result !== "success") {
-      throw new Error((data && data.message) ? data.message : "Unknown submit error");
-    }
+        alert(force ? "Test submit succeeded!" : "Submitted! Starting a new blank inspection.");
 
-    alert(force ? "Test submit succeeded!" : "Submitted! Starting a new blank inspection.");
+        if (!force) {
+          localStorage.removeItem(STORAGE_KEY);
+          answers = new Map();
+          hiddenGroups = new Set();
+          idx = 0;
+          setStage("setup");
+        }
 
-    // For test submits, you might want to keep answers; for now we keep everything as-is.
-    // If you want test submit to NOT clear anything, leave this block empty.
-    if (!force) {
-      localStorage.removeItem(STORAGE_KEY);
-      answers = new Map();
-      hiddenGroups = new Set();
-      idx = 0;
-      setStage("setup");
+      } catch (err) {
+        console.error("Submit failed:", err);
+        alert("Error submitting inspection. Check console for details.");
+      } finally {
+        submitBtn.disabled = false;
+        testSubmitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+        testSubmitBtn.textContent = "Submit test";
+      }
     }
 
-  } catch (err) {
-    console.error("Submit failed:", err);
-    alert("Error submitting inspection. Check console for details.");
-  } finally {
-    submitBtn.disabled = false;
-    testSubmitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
-    testSubmitBtn.textContent = "Submit test";
-  }
-}
     submitBtn.addEventListener("click", () => submitInspection(false));
     testSubmitBtn.addEventListener("click", () => submitInspection(true));
 
@@ -961,9 +930,9 @@ function advanceAfterAnswer() {
       QUESTION_BANK = qRows.map(normalizeQuestionRow);
       LOGIC_RULES = logicRows.map(normalizeLogicRow);
 
-      areaSelect.innerHTML = `<option value="">Select area…</option>` + AREAS.map(a =>
-        `<option value="${a.id}">${a.name}</option>`
-      ).join("");
+      areaSelect.innerHTML =
+        `<option value="">Select area…</option>` +
+        AREAS.map(a => `<option value="${a.id}">${a.name}</option>`).join("");
 
       const restored = loadState();
       if (restored) {
@@ -973,7 +942,6 @@ function advanceAfterAnswer() {
         if (session.areaId) {
           areaSelect.value = session.areaId;
           rebuildQuestionsForArea();
-
           setStage("wizard");
           renderQuestion();
           return;
